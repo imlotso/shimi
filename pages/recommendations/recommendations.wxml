@@ -1,0 +1,66 @@
+<view class="page recommendation-page">
+  <view class="result-hero">
+    <view class="result-copy">
+      <text class="result-kicker">今晚食材雷达</text>
+      <text class="result-title">{{topRecipe ? topRecipe.name : '先选食材'}}</text>
+      <text class="result-desc">{{topRecipe ? topRecipe.subtitle : '挑几样冰箱里的东西，我来给你配一餐。'}}</text>
+    </view>
+    <image wx:if="{{topRecipe}}" class="result-hero-img" src="{{topRecipe.image}}" mode="aspectFill" />
+  </view>
+
+  <view class="selected-panel">
+    <view class="selected-title-line">
+      <text class="selected-title">已选食材</text>
+      <button class="selected-edit" bindtap="reselectIngredients">重新选择</button>
+    </view>
+    <view class="selected-list" wx:if="{{selectedIngredients.length}}">
+      <view wx:for="{{selectedIngredients}}" wx:key="id" class="selected-chip">
+        <image class="selected-chip-img" src="{{item.image}}" mode="aspectFit" />
+        <text>{{item.name}}</text>
+      </view>
+    </view>
+    <text wx:else class="selected-empty">未选择食材，已按高胜率快手菜推荐。</text>
+  </view>
+
+  <view class="section-head">
+    <text class="section-title">推荐菜谱</text>
+    <button wx:if="{{canShuffle}}" class="section-action" bindtap="shuffleRecipes">换一批</button>
+  </view>
+  <view wx:if="{{noticeText}}" class="recommend-notice">
+    <text>{{noticeText}}</text>
+  </view>
+
+  <view class="recommend-list" wx:if="{{recommendations.length}}">
+    <view
+      wx:for="{{recommendations}}"
+      wx:key="id"
+      class="recommend-card"
+      hover-class="tap-card"
+      data-id="{{item.id}}"
+      bindtap="openRecipe"
+    >
+      <image class="recommend-img" src="{{item.image}}" mode="aspectFill" />
+      <view class="recommend-body">
+        <view class="recommend-head">
+          <text class="recommend-name">{{item.name}}</text>
+          <text class="recommend-time">{{item.time}} 分钟</text>
+        </view>
+        <text class="recommend-sub">{{item.reason}}</text>
+        <view class="recommend-meta">
+          <text class="meta-pill lime">{{item.matchText}}</text>
+          <text class="meta-pill">{{item.missingText}}</text>
+        </view>
+        <view class="tag-row">
+          <text class="tag {{item.fatLoss ? 'green' : 'red'}}">{{item.fatLoss ? '减脂友好' : item.category}}</text>
+          <text class="tag blue">{{item.calories}} kcal</text>
+          <text class="tag">{{item.protein}}g 蛋白</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view wx:else class="empty-state">
+    <text class="empty-title">暂时没有合适推荐</text>
+    <text class="empty-copy">换几个更常见的食材试试，比如鸡蛋、番茄、土豆或鸡胸肉。</text>
+  </view>
+</view>

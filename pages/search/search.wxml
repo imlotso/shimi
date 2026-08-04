@@ -1,0 +1,76 @@
+<view class="page search-page">
+  <view class="catalog-hero">
+    <view class="catalog-copy">
+      <text class="catalog-kicker">菜谱库</text>
+      <text class="catalog-title">想吃什么，直接开找</text>
+      <text class="catalog-sub">按食材、时间、减脂目标快速筛，少翻几页，多留点时间吃饭。</text>
+    </view>
+    <image wx:if="{{heroRecipe}}" class="catalog-img" src="{{heroRecipe.image}}" mode="aspectFill" />
+  </view>
+
+  <view class="search-top">
+    <view class="search-input-shell">
+      <text class="search-symbol">⌕</text>
+      <input
+        class="search-input"
+        placeholder="搜菜名、食材或标签"
+        value="{{keyword}}"
+        confirm-type="search"
+        bindinput="onInput"
+      />
+      <button wx:if="{{keyword}}" class="search-clear" bindtap="clearKeyword">清空</button>
+    </view>
+  </view>
+
+  <scroll-view scroll-x class="filter-scroll" enable-flex>
+    <view class="filter-row">
+      <button
+        wx:for="{{filters}}"
+        wx:key="id"
+        class="filter-pill {{activeFilter == item.id ? 'active' : ''}}"
+        data-id="{{item.id}}"
+        bindtap="setFilter"
+      >
+        <text class="filter-name">{{item.name}}</text>
+        <text class="filter-copy">{{item.copy}}</text>
+      </button>
+    </view>
+  </scroll-view>
+
+  <view class="result-count">
+    <text>{{results.length}} 道菜谱</text>
+  </view>
+
+  <view class="search-list" wx:if="{{results.length}}">
+    <view
+      wx:for="{{results}}"
+      wx:key="id"
+      class="search-card"
+      hover-class="tap-card"
+      data-id="{{item.id}}"
+      bindtap="openRecipe"
+    >
+      <image class="search-card-img" src="{{item.image}}" mode="aspectFill" />
+      <view class="search-card-body">
+        <view class="search-card-head">
+          <text class="search-card-name">{{item.name}}</text>
+          <text class="search-card-rating">{{item.rating}} 分</text>
+        </view>
+        <text class="search-card-sub">{{item.subtitle}}</text>
+        <view class="search-metrics">
+          <text>{{item.time}} 分钟</text>
+          <text>{{item.difficulty}} 星难度</text>
+          <text>{{item.calories}} kcal</text>
+        </view>
+        <view class="tag-row">
+          <text wx:for="{{item.tags}}" wx:key="*this" class="tag {{item == '高蛋白' || item == '减脂友好' ? 'green' : ''}}">{{item}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view wx:else class="empty-state">
+    <text class="empty-title">没有搜到相关菜谱</text>
+    <text class="empty-copy">先试试更常见的关键词，比如“鸡蛋”“番茄”“减脂”。</text>
+  </view>
+</view>

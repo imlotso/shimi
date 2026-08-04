@@ -1,0 +1,95 @@
+<view class="page fat-page">
+  <view class="fat-hero">
+    <view>
+      <text class="fat-kicker">低负担晚餐</text>
+      <text class="fat-title">减脂也要吃得像样</text>
+      <text class="fat-copy">优先推荐低油、高蛋白、步骤简单的菜谱，适合普通上班族日常执行。</text>
+    </view>
+    <image wx:if="{{heroRecipe}}" class="fat-hero-img" src="{{heroRecipe.image}}" mode="aspectFill" />
+  </view>
+
+  <scroll-view scroll-x class="goal-scroll" enable-flex>
+    <view class="goal-row">
+      <button
+        wx:for="{{goals}}"
+        wx:key="id"
+        class="goal-card {{activeGoal == item.id ? 'active' : ''}}"
+        data-id="{{item.id}}"
+        bindtap="setGoal"
+      >
+        <view class="goal-topline">
+          <text class="goal-mark">{{item.mark}}</text>
+          <text class="goal-metric">{{item.metric}}</text>
+        </view>
+        <text class="goal-name">{{item.name}}</text>
+        <text class="goal-copy">{{item.copy}}</text>
+        <view class="goal-bars">
+          <text></text>
+          <text></text>
+          <text></text>
+        </view>
+      </button>
+    </view>
+  </scroll-view>
+
+  <view class="section-head">
+    <text class="section-title">今日轻食推荐</text>
+    <text class="section-action">按目标筛选</text>
+  </view>
+  <view class="fat-recipe-list">
+    <view
+      wx:for="{{goalRecipes}}"
+      wx:key="id"
+      class="fat-recipe"
+      hover-class="tap-card"
+      data-id="{{item.id}}"
+      bindtap="openRecipe"
+    >
+      <image class="fat-recipe-img" src="{{item.image}}" mode="aspectFill" />
+      <view class="fat-recipe-body">
+        <view class="fat-recipe-head">
+          <text class="fat-recipe-name">{{item.name}}</text>
+          <text class="fat-calorie">{{item.calories}} kcal</text>
+        </view>
+        <text class="fat-recipe-sub">{{item.subtitle}}</text>
+        <view class="fat-metrics">
+          <text>{{item.protein}}g 蛋白质</text>
+          <text>{{item.time}} 分钟</text>
+          <text>{{item.difficulty}} 星难度</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="section-head">
+    <text class="section-title">5 天轻食安排</text>
+    <text class="section-action">午晚餐灵感</text>
+  </view>
+  <view class="plan-list">
+    <view wx:for="{{plan}}" wx:key="day" class="plan-day">
+      <view class="plan-day-head">
+        <view>
+          <text class="plan-day-name">{{item.day}}</text>
+          <text class="plan-day-title">{{item.title}}</text>
+        </view>
+        <text class="plan-day-meta">{{item.calories}} kcal · {{item.protein}}g 蛋白</text>
+      </view>
+      <view class="plan-recipes">
+        <button
+          wx:for="{{item.recipes}}"
+          wx:key="id"
+          wx:for-item="recipe"
+          class="plan-recipe-pill"
+          data-id="{{recipe.id}}"
+          bindtap="openRecipe"
+        >
+          {{recipe.name}}
+        </button>
+      </view>
+    </view>
+  </view>
+
+  <view class="fat-note">
+    <text>热量为单人份估计。减脂效果还取决于总摄入、运动、睡眠和个人身体情况；如有基础疾病或特殊饮食需求，应咨询专业人士。</text>
+  </view>
+</view>

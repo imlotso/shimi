@@ -1,0 +1,108 @@
+<view wx:if="{{recipe}}" class="detail-page">
+  <view class="dish-visual">
+    <image class="dish-image" src="{{recipe.image}}" mode="aspectFill" />
+    <view class="dish-label">
+      <text>{{recipe.category}}</text>
+    </view>
+  </view>
+
+  <view class="dish-head">
+    <view class="dish-title-line">
+      <view class="dish-title-copy">
+        <text class="dish-name">{{recipe.name}}</text>
+        <text class="dish-subtitle">{{recipe.subtitle}}</text>
+      </view>
+      <button class="favorite-button {{isFavorite ? 'active' : ''}}" bindtap="toggleFavorite">
+        {{isFavorite ? '已藏' : '收藏'}}
+      </button>
+    </view>
+
+    <view class="dish-metrics">
+      <view class="metric">
+        <text class="metric-main">{{recipe.time}}</text>
+        <text class="metric-sub">分钟</text>
+      </view>
+      <view class="metric">
+        <text class="metric-main">{{recipe.difficulty}}</text>
+        <text class="metric-sub">难度</text>
+      </view>
+      <view class="metric">
+        <text class="metric-main">{{recipe.calories}}</text>
+        <text class="metric-sub">kcal 估计</text>
+      </view>
+      <view class="metric">
+        <text class="metric-main">{{recipe.protein}}g</text>
+        <text class="metric-sub">蛋白质</text>
+      </view>
+    </view>
+
+    <view class="tag-row detail-tags">
+      <text wx:for="{{recipe.tags}}" wx:key="*this" class="tag {{recipe.fatLoss ? 'green' : ''}}">{{item}}</text>
+    </view>
+  </view>
+
+  <view class="detail-section">
+    <view class="section-head compact">
+      <text class="section-title">食材清单</text>
+      <text class="section-action">{{recipe.ingredients.length}} 项</text>
+    </view>
+    <view class="ingredient-sheet">
+      <view wx:for="{{recipe.decoratedIngredients}}" wx:key="name" class="detail-ingredient">
+        <view class="detail-ingredient-copy">
+          <text class="ingredient-dot"></text>
+          <text class="detail-ingredient-name">{{item.name}}</text>
+          <text class="detail-ingredient-amount">{{item.amount}}</text>
+        </view>
+        <image class="detail-ingredient-img" src="{{item.image}}" mode="aspectFill" />
+      </view>
+    </view>
+  </view>
+
+  <view class="detail-section">
+    <view class="section-head compact">
+      <text class="section-title">一步步做</text>
+      <text class="section-action">{{recipe.difficultyText}}</text>
+    </view>
+    <view class="step-list">
+      <view wx:for="{{recipe.decoratedSteps}}" wx:key="id" class="step-item {{item.image ? 'with-image' : 'text-only'}}">
+        <text class="step-number">{{index + 1}}</text>
+        <text class="step-copy">{{item.text}}</text>
+        <view wx:if="{{item.image}}" class="step-visual {{item.actionClass}}">
+          <image class="step-stage-img" src="{{item.image}}" mode="aspectFill" />
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="nutrition-note">
+    <text class="note-title">营养说明</text>
+    <text class="note-copy">热量和蛋白质为单人份估计值，实际会随食材大小、用油量和调料变化。</text>
+  </view>
+
+  <view class="section-head">
+    <text class="section-title">相似灵感</text>
+  </view>
+  <view class="related-row">
+    <view
+      wx:for="{{relatedRecipes}}"
+      wx:key="id"
+      class="related-card"
+      hover-class="tap-card"
+      data-id="{{item.id}}"
+      bindtap="openRecipe"
+    >
+      <image class="related-img" src="{{item.image}}" mode="aspectFill" />
+      <text class="related-name">{{item.name}}</text>
+      <text class="related-meta">{{item.time}} 分钟 · {{item.calories}} kcal</text>
+    </view>
+  </view>
+</view>
+
+<view wx:elif="{{loadFailed}}" class="detail-empty">
+  <text class="empty-title">菜谱没找到</text>
+  <text class="empty-copy">请返回菜谱库重新打开。</text>
+</view>
+
+<view wx:else class="detail-empty">
+  <text class="empty-title">正在加载菜谱</text>
+</view>

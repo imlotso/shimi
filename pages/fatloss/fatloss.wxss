@@ -1,0 +1,348 @@
+.fat-page {
+  padding-bottom: 64rpx;
+}
+
+.fat-hero {
+  position: relative;
+  min-height: 312rpx;
+  overflow: hidden;
+  padding: 34rpx;
+  border-radius: 18rpx;
+  background: linear-gradient(135deg, #e6f2ee, #dcebdd 58%, #f5efe4);
+  box-shadow: 0 20rpx 48rpx rgba(54, 90, 75, 0.12);
+}
+
+.fat-hero::after {
+  content: "";
+  position: absolute;
+  right: 262rpx;
+  bottom: 32rpx;
+  width: 70rpx;
+  height: 10rpx;
+  border-radius: 999rpx;
+  background: #73c7be;
+}
+
+.fat-kicker {
+  display: block;
+  color: #35736e;
+  font-size: 23rpx;
+  font-weight: 900;
+}
+
+.fat-title {
+  display: block;
+  width: 420rpx;
+  margin-top: 18rpx;
+  font-size: 50rpx;
+  line-height: 1.08;
+  font-weight: 900;
+}
+
+.fat-copy {
+  display: block;
+  width: 392rpx;
+  margin-top: 18rpx;
+  color: #60776f;
+  font-size: 25rpx;
+  line-height: 1.5;
+}
+
+.fat-hero-img {
+  position: absolute;
+  right: 26rpx;
+  bottom: 28rpx;
+  width: 248rpx;
+  height: 184rpx;
+  border: 2rpx solid rgba(53, 115, 110, 0.12);
+  border-radius: 16rpx;
+  background: #fffdf6;
+  box-shadow: 0 22rpx 48rpx rgba(54, 90, 75, 0.14);
+}
+
+.goal-scroll {
+  width: 100%;
+  margin-top: 22rpx;
+  white-space: nowrap;
+}
+
+.goal-row {
+  display: flex;
+  gap: 16rpx;
+  padding: 0 0 8rpx;
+}
+
+.goal-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 272rpx;
+  width: 272rpx;
+  min-height: 178rpx;
+  overflow: hidden;
+  padding: 18rpx;
+  border: 2rpx solid rgba(70, 52, 34, 0.07);
+  border-radius: 16rpx;
+  background: #fffdf6;
+  text-align: left;
+  box-shadow: 0 14rpx 32rpx rgba(81, 59, 35, 0.06);
+}
+
+.goal-card::after {
+  content: "";
+  position: absolute;
+  right: -24rpx;
+  bottom: -34rpx;
+  width: 112rpx;
+  height: 112rpx;
+  border: 16rpx solid rgba(115, 199, 190, 0.16);
+  border-radius: 50%;
+}
+
+.goal-card.active {
+  border-color: rgba(24, 23, 19, 0.9);
+  background: #181713;
+  color: #fffdf6;
+  box-shadow: 0 12rpx 28rpx rgba(89, 118, 52, 0.18);
+}
+
+.goal-topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  z-index: 2;
+}
+
+.goal-mark {
+  color: #d86546;
+  font-size: 22rpx;
+  font-weight: 900;
+}
+
+.goal-card.active .goal-mark {
+  color: #cde88f;
+}
+
+.goal-metric {
+  height: 38rpx;
+  padding: 0 12rpx;
+  border-radius: 999rpx;
+  background: #eaf4d6;
+  color: #181713;
+  font-size: 20rpx;
+  font-weight: 900;
+  line-height: 38rpx;
+}
+
+.goal-card.active .goal-metric {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fffdf6;
+}
+
+.goal-name {
+  position: relative;
+  z-index: 2;
+  display: block;
+  margin-top: 22rpx;
+  font-size: 30rpx;
+  font-weight: 900;
+}
+
+.goal-copy {
+  position: relative;
+  z-index: 2;
+  display: block;
+  margin-top: 12rpx;
+  color: #6a5f52;
+  font-size: 22rpx;
+  line-height: 1.4;
+  white-space: normal;
+}
+
+.goal-card.active .goal-copy {
+  color: rgba(255, 253, 246, 0.72);
+}
+
+.goal-bars {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  gap: 8rpx;
+  margin-top: auto;
+  padding-top: 16rpx;
+}
+
+.goal-bars text {
+  display: block;
+  height: 8rpx;
+  border-radius: 999rpx;
+  background: #cde88f;
+}
+
+.goal-bars text:nth-child(1) {
+  width: 34rpx;
+}
+
+.goal-bars text:nth-child(2) {
+  width: 58rpx;
+  background: #73c7be;
+}
+
+.goal-bars text:nth-child(3) {
+  width: 24rpx;
+  background: #e58a65;
+}
+
+.fat-recipe-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+  width: 100%;
+}
+
+.fat-recipe {
+  position: relative;
+  display: flex;
+  width: 100%;
+  overflow: hidden;
+  min-height: 224rpx;
+  border: 2rpx solid rgba(70, 52, 34, 0.07);
+  border-radius: 16rpx;
+  background: #fffdf6;
+  text-align: left;
+  box-shadow: 0 20rpx 48rpx rgba(81, 59, 35, 0.08);
+}
+
+.fat-recipe::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 6rpx;
+  background: #73c7be;
+}
+
+.fat-recipe-img {
+  flex: 0 0 238rpx;
+  width: 238rpx;
+  height: 224rpx;
+  background: #e8ddcb;
+}
+
+.fat-recipe-body {
+  flex: 1;
+  min-width: 0;
+  padding: 20rpx 20rpx 18rpx;
+}
+
+.fat-recipe-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14rpx;
+}
+
+.fat-recipe-name {
+  flex: 1;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 32rpx;
+  font-weight: 900;
+}
+
+.fat-calorie {
+  color: #35736e;
+  font-size: 24rpx;
+  font-weight: 900;
+}
+
+.fat-recipe-sub {
+  display: block;
+  margin-top: 10rpx;
+  color: #74695b;
+  font-size: 24rpx;
+  line-height: 1.45;
+}
+
+.fat-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10rpx;
+  margin-top: 14rpx;
+  color: #181713;
+  font-size: 21rpx;
+  font-weight: 800;
+}
+
+.plan-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.plan-day {
+  width: 100%;
+  padding: 20rpx;
+  border: 2rpx solid rgba(70, 52, 34, 0.07);
+  border-radius: 16rpx;
+  background: #fffdf6;
+  box-shadow: 0 12rpx 28rpx rgba(81, 59, 35, 0.05);
+}
+
+.plan-day-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18rpx;
+}
+
+.plan-day-name {
+  display: block;
+  color: #d86546;
+  font-size: 22rpx;
+  font-weight: 900;
+}
+
+.plan-day-title {
+  display: block;
+  margin-top: 6rpx;
+  font-size: 28rpx;
+  font-weight: 900;
+}
+
+.plan-day-meta {
+  color: #81786b;
+  font-size: 22rpx;
+  font-weight: 800;
+}
+
+.plan-recipes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10rpx;
+  margin-top: 18rpx;
+}
+
+.plan-recipe-pill {
+  height: 52rpx;
+  padding: 0 16rpx;
+  border-radius: 12rpx;
+  background: #eef5df;
+  color: #181713;
+  font-size: 23rpx;
+  font-weight: 800;
+  line-height: 52rpx;
+}
+
+.fat-note {
+  margin-top: 28rpx;
+  padding: 20rpx;
+  border-radius: 16rpx;
+  background: rgba(65, 49, 32, 0.06);
+  color: #7a7063;
+  font-size: 22rpx;
+  line-height: 1.55;
+}

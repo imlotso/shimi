@@ -1,0 +1,96 @@
+<view class="page profile-page">
+  <view class="profile-hero">
+    <view class="profile-hero-copy">
+      <text class="profile-kicker">个人餐盘</text>
+      <text class="profile-title">把常吃的路子留住</text>
+      <text class="profile-copy">这里先保存收藏和最近看过，后续可以加登录、偏好、忌口和购物清单。</text>
+    </view>
+    <image class="profile-hero-img avatar" src="/assets/images/brand/app-avatar.jpg" mode="aspectFill" />
+  </view>
+
+  <view class="profile-actions">
+    <button class="profile-action lime" bindtap="goIngredients">
+      <text class="action-title">继续选食材</text>
+      <text class="action-copy">冰箱里有什么就点什么</text>
+    </button>
+    <button class="profile-action blue" bindtap="goFatLoss">
+      <text class="action-title">看减脂餐</text>
+      <text class="action-copy">低油高蛋白灵感</text>
+    </button>
+  </view>
+
+  <view class="feedback-card">
+    <view class="feedback-head">
+      <view>
+        <text class="feedback-kicker">意见反馈</text>
+        <text class="feedback-title">哪里不好用，直接告诉我</text>
+      </view>
+      <text class="feedback-badge">匿名</text>
+    </view>
+    <textarea
+      class="feedback-textarea"
+      value="{{feedbackText}}"
+      maxlength="300"
+      placeholder="比如：推荐不准、菜谱步骤不清楚、图片不合适、想加某个功能..."
+      placeholder-class="feedback-placeholder"
+      auto-height="{{false}}"
+      bindinput="onFeedbackInput"
+    />
+    <view class="feedback-footer">
+      <text class="feedback-count">{{feedbackCount}}/300</text>
+      <button
+        class="feedback-submit {{feedbackSubmitting ? 'loading' : ''}}"
+        loading="{{feedbackSubmitting}}"
+        disabled="{{feedbackSubmitting}}"
+        bindtap="submitFeedback"
+      >{{feedbackSubmitting ? '发送中' : '发送反馈'}}</button>
+    </view>
+    <text wx:if="{{feedbackMessage}}" class="feedback-message {{feedbackMessageType}}">{{feedbackMessage}}</text>
+  </view>
+
+  <view class="section-head">
+    <text class="section-title">我的收藏</text>
+    <text class="section-action">{{favorites.length}} 道</text>
+  </view>
+  <view wx:if="{{favorites.length}}" class="profile-list">
+    <view
+      wx:for="{{favorites}}"
+      wx:key="id"
+      class="profile-recipe"
+      hover-class="tap-card"
+      data-id="{{item.id}}"
+      bindtap="openRecipe"
+    >
+      <image class="profile-recipe-img" src="{{item.image}}" mode="aspectFill" />
+      <view class="profile-recipe-body">
+        <text class="profile-recipe-name">{{item.name}}</text>
+        <text class="profile-recipe-meta">{{item.time}} 分钟 · {{item.calories}} kcal · {{item.protein}}g 蛋白</text>
+      </view>
+    </view>
+  </view>
+  <view wx:else class="empty-state">
+    <text class="empty-title">还没有收藏</text>
+    <text class="empty-copy">打开菜谱详情，点“收藏”，常做的菜就会出现在这里。</text>
+  </view>
+
+  <view class="section-head">
+    <text class="section-title">最近看过</text>
+  </view>
+  <view wx:if="{{history.length}}" class="history-grid">
+    <view
+      wx:for="{{history}}"
+      wx:key="id"
+      class="history-card"
+      hover-class="tap-card"
+      data-id="{{item.id}}"
+      bindtap="openRecipe"
+    >
+      <image class="history-img" src="{{item.image}}" mode="aspectFill" />
+      <text class="history-name">{{item.name}}</text>
+    </view>
+  </view>
+  <view wx:else class="empty-state">
+    <text class="empty-title">还没有浏览记录</text>
+    <text class="empty-copy">先去菜谱库逛一圈，系统会自动记录最近看过的菜。</text>
+  </view>
+</view>

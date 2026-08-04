@@ -1,0 +1,10 @@
+{
+  "name": "submit-feedback",
+  "version": "1.0.0",
+  "description": "Store anonymous mini program feedback and optionally forward it by email.",
+  "main": "index.js",
+  "dependencies": {
+    "nodemailer": "^6.9.14",
+    "wx-server-sdk": "^3.0.1"
+  }
+}

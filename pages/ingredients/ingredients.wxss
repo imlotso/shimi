@@ -1,0 +1,213 @@
+.ingredient-page {
+  min-height: 100vh;
+  padding: 24rpx 24rpx 236rpx;
+  background: #f4efe4;
+}
+
+.search-shell {
+  display: flex;
+  align-items: center;
+  height: 88rpx;
+  padding: 0 18rpx 0 24rpx;
+  border: 2rpx solid rgba(70, 52, 34, 0.08);
+  border-radius: 16rpx;
+  background: #fffdf6;
+  box-shadow: 0 14rpx 34rpx rgba(81, 59, 35, 0.06);
+}
+
+.search-mark {
+  margin-right: 14rpx;
+  font-size: 34rpx;
+  font-weight: 900;
+}
+
+.ingredient-search {
+  flex: 1;
+  height: 86rpx;
+  font-size: 26rpx;
+}
+
+.clear-search {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 56rpx;
+  padding: 0 18rpx;
+  border-radius: 12rpx;
+  background: #181713;
+  color: #fffdf6;
+  font-size: 24rpx;
+  font-weight: 800;
+}
+
+.selector-layout {
+  display: grid;
+  grid-template-columns: 158rpx 1fr;
+  gap: 16rpx;
+  height: calc(100vh - 348rpx);
+  margin-top: 22rpx;
+}
+
+.category-rail {
+  height: 100%;
+  border-right: 2rpx solid rgba(70, 52, 34, 0.08);
+}
+
+.category-tab {
+  display: flex;
+  align-items: center;
+  width: 138rpx;
+  height: 84rpx;
+  margin-bottom: 10rpx;
+  padding-left: 16rpx;
+  border-radius: 14rpx;
+  color: #74695b;
+  font-size: 26rpx;
+  font-weight: 800;
+  text-align: left;
+}
+
+.category-tab.active {
+  background: #181713;
+  color: #fffdf6;
+}
+
+.ingredient-list {
+  height: 100%;
+}
+
+.ingredient-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14rpx;
+  padding-bottom: 30rpx;
+}
+
+.ingredient-item {
+  display: grid;
+  position: relative;
+  grid-template-columns: 56rpx 1fr;
+  align-items: center;
+  min-height: 108rpx;
+  padding: 14rpx 46rpx 14rpx 12rpx;
+  border: 2rpx solid rgba(70, 52, 34, 0.07);
+  border-radius: 16rpx;
+  background: #fffdf6;
+  text-align: left;
+  box-shadow: 0 12rpx 28rpx rgba(81, 59, 35, 0.05);
+}
+
+.ingredient-item.selected {
+  border-color: rgba(89, 118, 52, 0.34);
+  background: #eaf4d6;
+  box-shadow: inset 0 0 0 2rpx rgba(205, 232, 143, 0.62);
+}
+
+.ingredient-img {
+  width: 50rpx;
+  height: 50rpx;
+}
+
+.ingredient-info {
+  min-width: 0;
+}
+
+.ingredient-name {
+  display: block;
+  overflow: hidden;
+  color: #181713;
+  font-size: 28rpx;
+  font-weight: 900;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.ingredient-status {
+  display: block;
+  margin-top: 8rpx;
+  color: #81786b;
+  font-size: 20rpx;
+}
+
+.ingredient-plus {
+  position: absolute;
+  right: 12rpx;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38rpx;
+  height: 38rpx;
+  border: 2rpx solid rgba(70, 52, 34, 0.14);
+  border-radius: 50%;
+  color: #181713;
+  font-size: 24rpx;
+  font-weight: 900;
+}
+
+.selected-dock {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 10;
+  padding: 18rpx 24rpx 28rpx;
+  border-top: 2rpx solid rgba(70, 52, 34, 0.08);
+  background: rgba(255, 253, 246, 0.97);
+  box-shadow: 0 -14rpx 38rpx rgba(81, 59, 35, 0.08);
+}
+
+.selected-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.selected-count {
+  font-size: 24rpx;
+  font-weight: 900;
+}
+
+.selected-clear {
+  color: #d86546;
+  font-size: 24rpx;
+  font-weight: 800;
+}
+
+.selected-scroll {
+  margin: 14rpx 0 18rpx;
+  white-space: nowrap;
+}
+
+.selected-row {
+  display: flex;
+  gap: 12rpx;
+}
+
+.selected-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8rpx;
+  height: 58rpx;
+  padding: 0 14rpx 0 8rpx;
+  border-radius: 12rpx;
+  background: #eef5df;
+  color: #181713;
+  font-size: 24rpx;
+  font-weight: 800;
+}
+
+.selected-img {
+  width: 42rpx;
+  height: 42rpx;
+}
+
+.selected-x {
+  color: #81786b;
+  font-size: 28rpx;
+}
+
+.selected-action {
+  width: 100%;
+}

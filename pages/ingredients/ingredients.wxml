@@ -1,0 +1,75 @@
+<view class="ingredient-page">
+  <view class="search-shell">
+    <text class="search-mark">⌕</text>
+    <input
+      class="ingredient-search"
+      placeholder="搜索食材，如：番茄、鸡蛋、牛肉"
+      value="{{query}}"
+      confirm-type="search"
+      bindinput="onSearchInput"
+    />
+    <button wx:if="{{query}}" class="clear-search" bindtap="clearSearch">清空</button>
+  </view>
+
+  <view class="selector-layout">
+    <scroll-view class="category-rail" scroll-y>
+      <button
+        wx:for="{{categories}}"
+        wx:key="id"
+        class="category-tab {{activeCategory == item.id ? 'active' : ''}}"
+        data-id="{{item.id}}"
+        bindtap="switchCategory"
+      >
+        {{item.name}}
+      </button>
+    </scroll-view>
+
+    <scroll-view class="ingredient-list" scroll-y>
+      <view class="ingredient-grid">
+        <view
+          wx:for="{{visibleIngredients}}"
+          wx:key="id"
+          class="ingredient-item {{item.selected ? 'selected' : ''}}"
+          hover-class="tap-card"
+          data-id="{{item.id}}"
+          bindtap="toggleIngredient"
+        >
+          <image class="ingredient-img" src="{{item.image}}" mode="aspectFit" />
+          <view class="ingredient-info">
+            <text class="ingredient-name">{{item.name}}</text>
+            <text class="ingredient-status">{{item.selected ? '已放入餐盘' : '点一下加入'}}</text>
+          </view>
+          <text class="ingredient-plus">{{item.selected ? '✓' : '+'}}</text>
+        </view>
+      </view>
+
+      <view wx:if="{{!visibleIngredients.length}}" class="empty-state">
+        <text class="empty-title">没有找到这个食材</text>
+        <text class="empty-copy">可以先换个常见叫法搜索，比如“西红柿”或“番茄”。</text>
+      </view>
+    </scroll-view>
+  </view>
+
+  <view class="selected-dock">
+    <view class="selected-head">
+      <text class="selected-count">已选 {{selectedIds.length}} 种</text>
+      <button wx:if="{{selectedIds.length}}" class="selected-clear" bindtap="clearSelected">清空</button>
+    </view>
+    <scroll-view scroll-x class="selected-scroll" enable-flex>
+      <view class="selected-row">
+        <button
+          wx:for="{{selectedIngredients}}"
+          wx:key="id"
+          class="selected-pill"
+          data-id="{{item.id}}"
+          bindtap="removeSelected"
+        >
+          <image class="selected-img" src="{{item.image}}" mode="aspectFit" />
+          <text>{{item.name}}</text>
+          <text class="selected-x">×</text>
+        </button>
+      </view>
+    </scroll-view>
+    <button class="solid-button green selected-action" bindtap="goRecommendations">查看今晚能做什么</button>
+  </view>
+</view>
