@@ -42,7 +42,7 @@
 
 1. 打开微信开发者工具。
 2. 选择“导入项目”。
-3. 项目目录选择当前文件夹：`D:\develop\codex project\今天吃什么`。
+3. 项目目录选择文件夹
 4. AppID 暂时使用 `touristappid`，真实上线前需要替换为你的微信小程序 AppID。
 
 ## 资源生成
@@ -59,3 +59,6 @@
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\optimize-assets.ps1
 ```
+##反馈联系
+今晚有p是一个简单的vibe coding项目，只是练手测试用的，不是商用的，有很多地方做的不好，也不要来骂我，有需求想改进的可以再联系我
+17681127675@163.com
