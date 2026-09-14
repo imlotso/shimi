@@ -10,3 +10,4 @@ project.private.config.json
 Thumbs.db
 *.log
 test-draw.png
+scripts/.generated/

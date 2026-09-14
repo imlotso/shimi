@@ -3,20 +3,20 @@
   "packOptions": {
     "ignore": [
       {
-        "type": "folder",
-        "value": "scripts"
+        "value": "scripts",
+        "type": "folder"
       },
       {
-        "type": "folder",
-        "value": "docs"
+        "value": "docs",
+        "type": "folder"
       },
       {
-        "type": "file",
-        "value": "README.md"
+        "value": "README.md",
+        "type": "file"
       },
       {
-        "type": "file",
-        "value": ".gitignore"
+        "value": ".gitignore",
+        "type": "file"
       }
     ],
     "include": []
@@ -61,7 +61,7 @@
   },
   "compileType": "miniprogram",
   "libVersion": "3.5.0",
-  "appid": "*************",
+  "appid": "wx719045f9ecc3dbca",
   "projectname": "今晚有谱",
   "condition": {
     "search": {
@@ -92,5 +92,6 @@
   },
   "simulatorPluginLibVersion": {},
   "miniprogramRoot": "./",
-  "cloudfunctionRoot": "cloudfunctions/"
+  "cloudfunctionRoot": "cloudfunctions/",
+  "isGameTourist": false
 }
