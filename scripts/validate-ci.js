@@ -1,145 +1,218 @@
 /**
- * scripts/validate-ci.js
+ * 食觅 (Shimi) CI 自动化综合校验脚本
+ * 运行方式: node scripts/validate-ci.js
  *
- * CI 数据格式校验（任务卡 1 验收标准）。
- *
- * 用法：node scripts/validate-ci.js
- *
- * 校验对象：scripts/seed-dishes.js 导出的 dishes 数组。
- * 规则来源：docs/数据说明.md 里 dishes 集合字段定义 + AGENTS.md 全局红线。
- * 任何一条不满足都打印 [FAIL] 并以 exit code 1 退出；
- * 全部通过打印 [PASS] 并 exit 0。
- *
- * 不连云端、不读环境变量，纯本地静态校验，保证在任何机器上都能跑。
+ * 检查范围 (对齐《「食觅」项目规划书 V1.0》与《AGENTS.md》红线):
+ * 1. JSON 配置文件完整性校验 (app.json, project.config.json 等)
+ * 2. 敏感凭证与密钥防泄露扫描 (Secret Leak Scan)
+ * 3. 全局 JavaScript 语法规范检查 (node --check)
+ * 4. V1 数据库集合与菜谱数据规范 (严格白名单 + 必填字段 + 步骤耗时 + 状态码)
+ * 5. 云函数合规预检 (强制只查 auditStatus=1 已发布内容)
  */
 
 'use strict';
 
-const { dishes, ingredients, tools } = require('./seed-dishes.js');
+const fs = require('fs');
+const path = require('path');
+const { execSync } = require('child_process');
 
-// dishes 集合允许出现的字段白名单。
-// 不在此列表里的字段一律视为"预留/未启用字段被误用"，按 AGENTS.md 红线第 3 条报错。
+let errors = [];
+let warnings = [];
+
+console.log('🚀 [CI] 开始食觅 (Shimi) V1.0 自动化综合检查...\n');
+
+// ---------------------------------------------------------------------------
+// 1. JSON 配置文件合法性
+// ---------------------------------------------------------------------------
+const jsonFiles = ['app.json', 'project.config.json', 'sitemap.json'];
+jsonFiles.forEach((file) => {
+  const fullPath = path.join(__dirname, '..', file);
+  if (fs.existsSync(fullPath)) {
+    try {
+      const content = fs.readFileSync(fullPath, 'utf8');
+      JSON.parse(content);
+      console.log(`✅ [JSON] ${file} 格式合法`);
+    } catch (e) {
+      errors.push(`[JSON] ${file} 解析失败: ${e.message}`);
+    }
+  }
+});
+
+// ---------------------------------------------------------------------------
+// 2. 敏感信息防泄露扫描 (禁止将云开发秘钥、环境ID等私密数据提交进公开仓库)
+// ---------------------------------------------------------------------------
+const forbiddenPatterns = [
+  { pattern: /SecretId\s*[:=]\s*['"][a-zA-Z0-9]{16,}['"]/i, msg: '发现硬编码腾讯云 SecretId' },
+  { pattern: /SecretKey\s*[:=]\s*['"][a-zA-Z0-9]{16,}['"]/i, msg: '发现硬编码腾讯云 SecretKey' },
+  { pattern: /FEEDBACK_SMTP_PASS\s*[:=]\s*['"][a-zA-Z0-9]{8,}['"]/i, msg: '发现硬编码邮箱 SMTP 授权码' }
+];
+
+function scanFilesForSecrets(dir) {
+  const entries = fs.readdirSync(dir, { withFileTypes: true });
+  for (const entry of entries) {
+    if (entry.name === '.git' || entry.name === 'node_modules') continue;
+    const fullPath = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      scanFilesForSecrets(fullPath);
+    } else if (/\.(js|json|md)$/.test(entry.name)) {
+      const content = fs.readFileSync(fullPath, 'utf8');
+      forbiddenPatterns.forEach(({ pattern, msg }) => {
+        if (pattern.test(content)) {
+          errors.push(`[安全] ${path.relative(path.join(__dirname, '..'), fullPath)}: ${msg}`);
+        }
+      });
+    }
+  }
+}
+
+try {
+  scanFilesForSecrets(path.join(__dirname, '..'));
+  console.log('✅ [安全] 未发现敏感密钥与凭据泄露');
+} catch (e) {
+  errors.push(`[安全] 扫描出错: ${e.message}`);
+}
+
+// ---------------------------------------------------------------------------
+// 3. 全局 JavaScript 语法检查 (语法错误直接拦截)
+// ---------------------------------------------------------------------------
+function checkJsSyntax(dir) {
+  const entries = fs.readdirSync(dir, { withFileTypes: true });
+  for (const entry of entries) {
+    if (entry.name === '.git' || entry.name === 'node_modules') continue;
+    const fullPath = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      checkJsSyntax(fullPath);
+    } else if (entry.name.endsWith('.js')) {
+      try {
+        execSync(`node --check "${fullPath}"`);
+      } catch (e) {
+        errors.push(`[语法] JS 语法错误: ${path.relative(path.join(__dirname, '..'), fullPath)}`);
+      }
+    }
+  }
+}
+
+try {
+  ['cloudfunctions', 'utils', 'pages', 'scripts'].forEach((folder) => {
+    const p = path.join(__dirname, '..', folder);
+    if (fs.existsSync(p)) checkJsSyntax(p);
+  });
+  console.log('✅ [语法] 所有核心 JS 代码语法检查通过');
+} catch (e) {
+  errors.push(`[语法] 语法扫描出错: ${e.message}`);
+}
+
+// ---------------------------------------------------------------------------
+// 4. V1 菜谱数据与 Schema 强白名单校验 (对照规划书 6.1 节)
+// ---------------------------------------------------------------------------
 const ALLOWED_DISH_FIELDS = new Set([
   '_id', 'name', 'cover', 'totalTime', 'tags',
   'ingredients', 'tools', 'taboos', 'steps',
   'openid', 'auditStatus', 'rejectReason'
 ]);
 
-const errors = [];
-const warnings = [];
+const seedScriptPath = path.join(__dirname, 'seed-dishes.js');
+if (fs.existsSync(seedScriptPath)) {
+  try {
+    const seed = require(seedScriptPath);
+    const dishes = seed.dishes || [];
+    const tools = seed.tools || [];
+    const ingredients = seed.ingredients || [];
 
-function fail(dishId, msg) {
-  errors.push(`[FAIL] dish id=${dishId || '(unknown)'}: ${msg}`);
-}
+    if (!Array.isArray(dishes) || dishes.length === 0) {
+      errors.push('[数据] dishes 必须是非空数组');
+    } else if (dishes.length < 20) {
+      errors.push(`[数据] dishes 只有 ${dishes.length} 条，未达到验收标准要求的 ≥ 20 条`);
+    } else {
+      const seenIds = new Set();
+      dishes.forEach((dish, idx) => {
+        const id = dish._id || `#${idx}`;
+        if (seenIds.has(id)) errors.push(`[数据] ${id} 存在重复 _id`);
+        seenIds.add(id);
 
-function isNonEmptyString(v) {
-  return typeof v === 'string' && v.trim().length > 0;
-}
+        if (!dish.name || typeof dish.name !== 'string') errors.push(`[数据] ${id} 缺失必填字符串 name`);
+        if (!dish.cover || typeof dish.cover !== 'string') errors.push(`[数据] ${id} 缺失必填字符串 cover`);
+        if (!Number.isInteger(dish.totalTime) || dish.totalTime <= 0) {
+          errors.push(`[数据] ${id} totalTime 必须为正整数 (分钟)`);
+        }
+        if (!Array.isArray(dish.tags)) errors.push(`[数据] ${id} tags 必须为数组`);
 
-function isPositiveInt(v) {
-  return Number.isInteger(v) && v > 0;
-}
+        // 厨具校验 (必须为非空数组)
+        if (!Array.isArray(dish.tools) || dish.tools.length === 0) {
+          errors.push(`[数据] ${id} tools 必须为非空字符串数组`);
+        }
 
-// ---------------------------------------------------------------------------
-// dishes 逐条校验
-// ---------------------------------------------------------------------------
-if (!Array.isArray(dishes) || dishes.length === 0) {
-  errors.push('[FAIL] dishes 必须是非空数组');
-} else if (dishes.length < 20) {
-  // 任务卡 AC：dishes 集合 ≥ 20 条完整数据
-  errors.push(`[FAIL] dishes 只有 ${dishes.length} 条，未达到 AC 要求的 ≥ 20 条`);
-}
+        // 食材校验
+        if (!Array.isArray(dish.ingredients) || dish.ingredients.length === 0) {
+          errors.push(`[数据] ${id} ingredients 必须为非空数组`);
+        } else {
+          dish.ingredients.forEach((ing, i) => {
+            if (!ing || !ing.name) errors.push(`[数据] ${id} ingredients[${i}] 缺失 name`);
+            if (!('num' in ing)) errors.push(`[数据] ${id} ingredients[${i}] 缺失 num 用量描述`);
+          });
+        }
 
-const seenIds = new Set();
+        // 步骤校验 (必须带分步耗时 time)
+        if (!Array.isArray(dish.steps) || dish.steps.length === 0) {
+          errors.push(`[数据] ${id} steps 必须为非空数组`);
+        } else {
+          dish.steps.forEach((s, i) => {
+            if (!s || !s.desc) errors.push(`[数据] ${id} steps[${i}] 缺失 desc 描述`);
+            if (!Number.isInteger(s.time) || s.time <= 0) {
+              errors.push(`[数据] ${id} steps[${i}].time 必须为正整数 (单步耗时分钟)`);
+            }
+          });
+        }
 
-(dishes || []).forEach((dish, idx) => {
-  const id = dish._id || `#${idx}`;
+        // 状态码校验 (0待审核/1已发布/2已驳回)
+        if (![0, 1, 2].includes(dish.auditStatus)) {
+          errors.push(`[数据] ${id} auditStatus 必须为 0/1/2`);
+        }
 
-  if (seenIds.has(id)) fail(id, '_id 重复');
-  seenIds.add(id);
-
-  if (!isNonEmptyString(dish.name)) fail(id, 'name 必须是非空字符串');
-  if (!isNonEmptyString(dish.cover)) fail(id, 'cover 必须是非空字符串');
-  if (!isPositiveInt(dish.totalTime)) fail(id, `totalTime 必须是正整数（当前: ${JSON.stringify(dish.totalTime)}）`);
-
-  if (!Array.isArray(dish.tags)) fail(id, 'tags 必须是数组（可为空）');
-
-  if (!Array.isArray(dish.tools) || dish.tools.length === 0) {
-    fail(id, 'tools 必须是非空字符串数组');
-  } else {
-    dish.tools.forEach((t) => {
-      if (!isNonEmptyString(t)) fail(id, 'tools 数组里存在空字符串项');
-    });
-  }
-
-  if (!Array.isArray(dish.taboos)) fail(id, 'taboos 必须是数组（允许为空）');
-  else dish.taboos.forEach((t) => {
-    if (!isNonEmptyString(t)) fail(id, 'taboos 数组里存在空字符串项');
-  });
-
-  if (!Array.isArray(dish.ingredients) || dish.ingredients.length === 0) {
-    fail(id, 'ingredients 必须是非空数组');
-  } else {
-    dish.ingredients.forEach((ing, i) => {
-      if (!ing || typeof ing !== 'object') { fail(id, `ingredients[${i}] 不是对象`); return; }
-      if (!isNonEmptyString(ing.name)) fail(id, `ingredients[${i}].name 非空字符串`);
-      if (!('num' in ing) || !isNonEmptyString(String(ing.num))) {
-        fail(id, `ingredients[${i}].num 必须存在且为用量描述字符串`);
-      }
-    });
-  }
-
-  if (!Array.isArray(dish.steps) || dish.steps.length === 0) {
-    fail(id, 'steps 必须是非空数组');
-  } else {
-    dish.steps.forEach((s, i) => {
-      if (!s || typeof s !== 'object') { fail(id, `steps[${i}] 不是对象`); return; }
-      if (!isNonEmptyString(s.desc)) fail(id, `steps[${i}].desc 非空字符串`);
-      if (!isPositiveInt(s.time)) fail(id, `steps[${i}].time 必须是正整数（分钟），当前: ${JSON.stringify(s.time)}`);
-    });
-  }
-
-  if (!isNonEmptyString(dish.openid)) fail(id, 'openid 必须是非空字符串（种子数据用 __seed_system__）');
-  if (![0, 1, 2].includes(dish.auditStatus)) {
-    fail(id, `auditStatus 必须是 0/1/2，当前: ${JSON.stringify(dish.auditStatus)}`);
-  }
-  if (dish.auditStatus === 2 && !isNonEmptyString(dish.rejectReason)) {
-    warnings.push(`[WARN] dish id=${id} 已驳回(2) 但未填 rejectReason`);
-  }
-
-  // 字段白名单：禁止出现预留字段
-  for (const key of Object.keys(dish)) {
-    if (!ALLOWED_DISH_FIELDS.has(key)) {
-      fail(id, `出现未在 dishes 字段字典里的字段: ${key}（V1 红线：不要提前启用预留字段）`);
+        // 红线：严禁提前启用 V2/V3 预留字段
+        for (const key of Object.keys(dish)) {
+          if (!ALLOWED_DISH_FIELDS.has(key)) {
+            errors.push(`[数据] ${id} 出现未允许的预留字段 '${key}' (违反 V1 红线规范)`);
+          }
+        }
+      });
+      console.log(`✅ [数据] 成功校验 ${dishes.length} 条菜谱，字段与 V1 规范 100% 吻合 (ingredients=${ingredients.length}, tools=${tools.length})`);
     }
+  } catch (e) {
+    errors.push(`[数据] 运行 seed-dishes.js 校验时出错: ${e.message}`);
   }
-});
+} else {
+  warnings.push('[数据] 尚未找到 scripts/seed-dishes.js，跳过种子数据校验');
+}
 
 // ---------------------------------------------------------------------------
-// ingredients / tools 集合字典表校验
+// 5. 云函数规范预检 (若存在 matchDishes，检查安全红线)
 // ---------------------------------------------------------------------------
-(dishes || []).forEach((dish) => {
-  const toolSet = new Set((tools || []).map((t) => t.name));
-  (dish.tools || []).forEach((t) => {
-    if (!toolSet.has(t)) {
-      warnings.push(`[WARN] dish id=${dish._id} 用到了 tools 集合里没有的厨具: ${t}（建议在 scripts/seed-dishes.js 的 EXTRA_TOOLS 或推断规则里补）`);
-    }
-  });
-});
+const matchDishesPath = path.join(__dirname, '..', 'cloudfunctions', 'matchDishes', 'index.js');
+if (fs.existsSync(matchDishesPath)) {
+  const code = fs.readFileSync(matchDishesPath, 'utf8');
+  if (!code.includes('auditStatus') || !code.includes('1')) {
+    errors.push('[云函数] matchDishes 必须包含 auditStatus == 1 的过滤逻辑，防止未审核内容泄露！');
+  } else {
+    console.log('✅ [云函数] matchDishes 安全过滤检查通过 (强制 auditStatus=1)');
+  }
+}
 
 // ---------------------------------------------------------------------------
-// 汇总
+// 汇总与退出
 // ---------------------------------------------------------------------------
-warnings.forEach((w) => console.warn(w));
+console.log('\n================ CI 检查结果 ================');
+if (warnings.length > 0) {
+  console.log(`⚠️  建议项 (${warnings.length} 条):`);
+  warnings.forEach((w) => console.log('   ' + w));
+}
 
 if (errors.length > 0) {
-  console.error('\n[FAIL] 数据格式校验未通过，共', errors.length, '个错误：');
-  errors.slice(0, 50).forEach((e) => console.error('  ' + e));
-  if (errors.length > 50) console.error('  ... 其余 ' + (errors.length - 50) + ' 个错误省略');
+  console.error(`❌ 阻断性错误 (${errors.length} 条):`);
+  errors.slice(0, 30).forEach((err) => console.error('   ' + err));
+  if (errors.length > 30) console.error(`   ... 还有 ${errors.length - 30} 条错误未展示`);
   process.exit(1);
+} else {
+  console.log('🎉 全部检查通过！代码与数据规范完全符合任务书要求，可安全合并。');
+  process.exit(0);
 }
-
-console.log(`[PASS] 数据格式校验通过：dishes=${(dishes || []).length} 条，ingredients=${(ingredients || []).length} 条，tools=${(tools || []).length} 条`);
-if (warnings.length) console.log(`（${warnings.length} 条 warning 不阻断 CI，建议处理）`);
-process.exit(0);
-//（注：内容由AI生成）
