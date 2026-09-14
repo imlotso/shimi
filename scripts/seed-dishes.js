@@ -72,7 +72,7 @@ function inferTools(recipe) {
   const blob = `${recipe.name} ${Array.isArray(recipe.steps) ? recipe.steps.join(' ') : ''}`;
   if (/空气炸锅/.test(blob)) return ['空气炸锅'];
   if (/烤箱/.test(blob)) return ['烤箱'];
-  if (/电饭煲|电饭锅|电饭煲/.test(blob)) return ['电饭煲'];
+  if (/电饭煲|电饭锅/.test(blob)) return ['电饭煲'];
   if (/蒸锅|上蒸|蒸一|大火蒸|中火蒸|小火蒸/.test(blob)) return ['蒸锅'];
   const noStove = /沙拉|凉拌|酸奶|不用开火|水果碗|轻食杯/.test(blob) && !/炒|煎|炸|煮|焯|烤|焖/.test(blob);
   if (noStove) return ['沙拉碗'];
