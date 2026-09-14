@@ -1,0 +1,35 @@
+name: Shimi V1 CI
+
+on:
+  # 1. 允许管理员在 GitHub 网页端的 Actions 标签页手动点击 "Run workflow" 随时触发
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: '手动触发运行的原因/备注'
+        required: false
+        default: '管理员手动发起代码审查 CI 测试'
+
+  # 2. 开发者发起 PR 或更新 PR 时触发
+  pull_request:
+    branches: [ main ]
+
+  # 3. 合并到 main 主干时验证
+  push:
+    branches: [ main ]
+
+jobs:
+  validate:
+    name: Code & Schema Validation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Run CI Validation Script
+        run: node scripts/validate-ci.js

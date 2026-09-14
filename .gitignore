@@ -1,7 +1,6 @@
 node_modules/
 miniprogram_npm/
 dist/
-docs/
 cloudfunctions/**/node_modules/
 project.private.config.json
 .env
@@ -10,3 +9,4 @@ project.private.config.json
 Thumbs.db
 *.log
 test-draw.png
+scripts/.generated/*.seed.json
