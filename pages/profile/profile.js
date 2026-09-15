@@ -5,6 +5,37 @@ const { enableShareMenu, getDefaultShare, getTimelineShare } = require('../../ut
 const FEEDBACK_MAX_LENGTH = 300;
 const FEEDBACK_MIN_LENGTH = 4;
 
+function projectDish(dish) {
+  return {
+    ...dish,
+    id: dish._id || dish.id,
+    image: dish.cover || dish.image,
+    time: dish.totalTime || dish.time || 0,
+    name: dish.name,
+    calories: '',
+    protein: ''
+  };
+}
+
+function listCollect() {
+  return new Promise((resolve, reject) => {
+    if (!wx.cloud || !wx.cloud.callFunction) {
+      reject(new Error('cloud unavailable'));
+      return;
+    }
+    wx.cloud.callFunction({
+      name: 'manageCollect',
+      data: { action: 'list' }
+    }).then((res) => {
+      if (!res.result || !res.result.ok) {
+        reject(new Error((res.result && res.result.message) || '收藏读取失败'));
+        return;
+      }
+      resolve(res.result.data || []);
+    }).catch(reject);
+  });
+}
+
 Page({
   data: {
     favorites: [],
@@ -22,8 +53,36 @@ Page({
 
   onShow() {
     this.setData({
-      favorites: getRecipesByIds(getFavoriteIds()),
       history: getRecipesByIds(getHistoryIds()).slice(0, 6)
+    });
+    this.loadFavorites();
+  },
+
+  loadFavorites() {
+    // 优先从云数据库 collect 集合拉取收藏；云不可用时回退到本地历史收藏
+    const fallback = () => {
+      const local = getRecipesByIds(getFavoriteIds()).map(projectDish);
+      this.setData({ favorites: local });
+    };
+
+    listCollect().then((collectIds) => {
+      const idSet = new Set(collectIds);
+      wx.cloud.callFunction({
+        name: 'matchDishes',
+        data: { selectedIngredientIds: [], selectedToolIds: [], selectedTabooIds: [] }
+      }).then((res) => {
+        const all = (res.result && res.result.data) || [];
+        const favorites = all
+          .filter((dish) => idSet.has(dish._id))
+          .map(projectDish);
+        this.setData({ favorites });
+      }).catch((error) => {
+        console.warn('拉取收藏菜谱失败，使用本地收藏', error);
+        fallback();
+      });
+    }).catch((error) => {
+      console.warn('拉取云端收藏失败，使用本地收藏', error);
+      fallback();
     });
   },
 
@@ -123,8 +182,9 @@ Page({
   },
 
   openRecipe(event) {
+    const id = event.currentTarget.dataset.id;
     wx.navigateTo({
-      url: `/packages/detail/detail/detail?id=${event.currentTarget.dataset.id}`
+      url: `/packages/detail/detail/detail?dishId=${encodeURIComponent(id)}`
     });
   },
 

@@ -33,6 +33,19 @@ function toggleFavorite(id) {
   return ids.indexOf(id) >= 0;
 }
 
+// 按目标状态写入/移除本地收藏（用于与云端收藏状态保持一致）
+function toggleLocalFavorite(id, favorited) {
+  const ids = getFavoriteIds();
+  const index = ids.indexOf(id);
+  if (favorited) {
+    if (index < 0) ids.unshift(id);
+  } else if (index >= 0) {
+    ids.splice(index, 1);
+  }
+  writeIds(FAVORITE_KEY, ids);
+  return favorited;
+}
+
 function addHistory(id) {
   const ids = readIds(HISTORY_KEY).filter((item) => item !== id);
   ids.unshift(id);
@@ -47,6 +60,7 @@ module.exports = {
   getFavoriteIds,
   isFavorite,
   toggleFavorite,
+  toggleLocalFavorite,
   addHistory,
   getHistoryIds
 };

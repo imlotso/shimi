@@ -1,6 +1,5 @@
 const { ingredients } = require('../../../utils/data');
-const { recommendRecipes, getRecipeById } = require('../../../utils/recommender');
-const { addHistory, isFavorite, toggleFavorite } = require('../../../utils/storage');
+const { addHistory, isFavorite, toggleLocalFavorite } = require('../../../utils/storage');
 const { enableShareMenu, getDefaultShare, getTimelineShare } = require('../../../utils/share');
 
 const seasoningImageRules = [
@@ -14,12 +13,6 @@ const seasoningImageRules = [
   { keywords: ['温水', '热水', '清水', '水'], image: '/assets/images/ingredients/seasonings/water.jpg' },
   { keywords: ['酱汁'], image: '/assets/images/ingredients/seasonings/soy_sauce.jpg' }
 ];
-
-function getDifficultyText(level) {
-  if (level <= 1) return '1 星 · 很适合新手';
-  if (level === 2) return '2 星 · 稍微看火';
-  return '3 星 · 需要耐心';
-}
 
 function getSeasoningImage(text) {
   const rule = seasoningImageRules.find((item) =>
@@ -35,24 +28,63 @@ function getIngredientMatch(text) {
     }
     return (item.aliases || []).some((alias) => text.indexOf(alias) >= 0 || alias.indexOf(text) >= 0);
   });
-
   return ingredient || null;
 }
 
-function getIngredientImage(name) {
+function getIngredientImage(name, fallbackImage) {
   const text = String(name || '');
   const seasoningImage = getSeasoningImage(text);
   if (seasoningImage) return seasoningImage;
-
   const ingredient = getIngredientMatch(text);
-  return ingredient ? ingredient.image : '';
+  return (ingredient && ingredient.image) || fallbackImage || '';
 }
 
-function getMainIngredientImages(recipe) {
-  return (recipe.ingredientIds || recipe.mainIngredientIds || [])
-    .map((id) => ingredients.find((item) => item.id === id))
-    .filter(Boolean)
-    .map((item) => item.image);
+function getMainIngredientImage(dish) {
+  const names = Array.isArray(dish.mainIngredientIds) ? dish.mainIngredientIds : [];
+  const matched = names.length ? ingredients.find((item) => item.id === names[0]) : null;
+  return (matched && matched.image) || dish.cover || '';
+}
+
+function withDisplayFields(dish) {
+  const main = dish.mainIngredients || [];
+  const fallbackImage = getMainIngredientImage(dish) || dish.cover;
+  const decoratedIngredients = (Array.isArray(dish.ingredients) ? dish.ingredients : [])
+    .map((item) => {
+      const name = typeof item === 'string' ? item : item.name;
+      const num = typeof item === 'string' ? '' : item.num || item.amount || '';
+      return {
+        name,
+        amount: num,
+        image: getIngredientImage(name, fallbackImage)
+      };
+    })
+    .filter((item) => item.name);
+  const steps = Array.isArray(dish.steps) ? dish.steps : [];
+  const decoratedSteps = steps.map((step, index) => {
+    const text = typeof step === 'string' ? step : step.desc || step.text || '';
+    const action = getStepAction(text, index, steps.length);
+    return {
+      id: `step-${index + 1}`,
+      text,
+      action,
+      actionClass: `step-scene-${action}`,
+      image: index === steps.length - 1 ? dish.cover : ''
+    };
+  });
+
+  return {
+    ...dish,
+    image: dish.cover,
+    time: dish.totalTime || dish.time || 0,
+    subtitle: '',
+    difficulty: 1,
+    calories: '',
+    protein: '',
+    ingredients: Array.isArray(dish.ingredients) ? dish.ingredients : [],
+    decoratedIngredients,
+    decoratedSteps,
+    difficultyText: '照着步骤做就行'
+  };
 }
 
 function getStepAction(text, index, total) {
@@ -69,116 +101,38 @@ function getStepAction(text, index, total) {
   return index === 0 ? 'prep' : 'pan';
 }
 
-function getRecipeStageType(recipe) {
-  const ids = recipe.ingredientIds || recipe.mainIngredientIds || [];
-  const text = `${recipe.name} ${(recipe.ingredients || []).map((item) => item.name).join(' ')}`;
-  if (ids.some((id) => ['shrimp', 'fish_fillet', 'whole_fish', 'squid', 'clam', 'scallop', 'oyster', 'crayfish'].includes(id)) || /鱼|虾|鱿鱼|花甲|扇贝|生蚝|海鲜/.test(text)) {
-    return 'seafood';
-  }
-  if (ids.some((id) => ['pork', 'pork_belly', 'pork_loin', 'pig_trotter', 'beef', 'lamb', 'chicken_breast', 'chicken_thigh', 'chicken_wing', 'duck_leg'].includes(id)) || /肉|牛|羊|鸡|鸭|猪蹄|排骨|五花/.test(text)) {
-    return 'meat';
-  }
-  if (ids.some((id) => ['egg', 'duck_egg', 'quail_egg', 'salted_duck_egg', 'century_egg'].includes(id)) || /蛋/.test(text)) {
-    return 'egg';
-  }
-  return 'vegetable';
-}
-
-function getFallbackStepImage(recipe, action) {
-  const type = getRecipeStageType(recipe);
-  const base = '/packages/detail/assets/images/step-library';
-
-  if (action === 'mix' && type === 'egg') return `${base}/mix-egg.jpg`;
-  if (action === 'prep' && type === 'egg') return `${base}/mix-egg.jpg`;
-  if ((action === 'pan' || action === 'aromatic' || action === 'seasoning') && type === 'egg') return `${base}/pan-egg.jpg`;
-  if (action === 'blanch' && type === 'seafood') return `${base}/blanch-seafood.jpg`;
-
-  const normalized = action === 'steam' ? 'pot' : action === 'seasoning' ? 'pan' : action === 'mix' ? 'prep' : action;
-  const key = ['prep', 'aromatic', 'pan', 'pot'].includes(normalized) ? normalized : 'pan';
-  const typed = type === 'egg' ? 'vegetable' : type;
-  return `${base}/${key}-${typed}.jpg`;
-}
-
-const recipeStepImageOverrides = {
-  'braised-trotter': [
-    '/packages/detail/assets/images/step-custom/braised-trotter/step-1.jpg',
-    '/packages/detail/assets/images/step-custom/braised-trotter/step-2.jpg',
-    '/packages/detail/assets/images/step-custom/braised-trotter/step-3.jpg',
-    '/packages/detail/assets/images/step-custom/braised-trotter/step-4.jpg',
-    '/packages/detail/assets/images/step-custom/braised-trotter/step-5.jpg'
-  ],
-  'carrot-beef-stew': [
-    '/packages/detail/assets/images/step-custom/carrot-beef-stew/step-1.jpg',
-    '/packages/detail/assets/images/step-custom/carrot-beef-stew/step-2.jpg',
-    '/packages/detail/assets/images/step-custom/carrot-beef-stew/step-3.jpg',
-    '/packages/detail/assets/images/step-custom/carrot-beef-stew/step-4.jpg',
-    '/packages/detail/assets/images/step-custom/carrot-beef-stew/step-5.jpg'
-  ],
-  'tomato-egg': [
-    '/packages/detail/assets/images/step-custom/tomato-egg/step-1.jpg',
-    '/packages/detail/assets/images/step-custom/tomato-egg/step-2.jpg',
-    '/packages/detail/assets/images/step-custom/tomato-egg/step-3.jpg',
-    '/packages/detail/assets/images/step-custom/tomato-egg/step-4.jpg',
-    '/packages/detail/assets/images/step-custom/tomato-egg/step-5.jpg'
-  ],
-  'clam-vermicelli-pot': [
-    '/packages/detail/assets/images/step-custom/clam-vermicelli-pot/step-1.jpg',
-    '/packages/detail/assets/images/step-custom/clam-vermicelli-pot/step-2.jpg',
-    '/packages/detail/assets/images/step-custom/clam-vermicelli-pot/step-3.jpg',
-    '/packages/detail/assets/images/step-custom/clam-vermicelli-pot/step-4.jpg',
-    '/packages/detail/assets/images/step-custom/clam-vermicelli-pot/step-5.jpg'
-  ],
-  'napa-vermicelli-pot': [
-    '/packages/detail/assets/images/step-custom/napa-vermicelli-pot/step-1.jpg',
-    '/packages/detail/assets/images/step-custom/napa-vermicelli-pot/step-2.jpg',
-    '/packages/detail/assets/images/step-custom/napa-vermicelli-pot/step-3.jpg',
-    '/packages/detail/assets/images/step-custom/napa-vermicelli-pot/step-4.jpg',
-    '/packages/detail/assets/images/step-custom/napa-vermicelli-pot/step-5.jpg'
-  ],
-  'squid-green-pepper': [
-    '/packages/detail/assets/images/step-custom/squid-green-pepper/step-1.jpg',
-    '/packages/detail/assets/images/step-custom/squid-green-pepper/step-2.jpg',
-    '/packages/detail/assets/images/step-custom/squid-green-pepper/step-3.jpg',
-    '/packages/detail/assets/images/step-custom/squid-green-pepper/step-4.jpg',
-    '/packages/detail/assets/images/step-custom/squid-green-pepper/step-5.jpg'
-  ]
-};
-
-function getStepImage(text, recipe, action, index, total) {
-  const overrideImages = recipeStepImageOverrides[recipe.id];
-  if (overrideImages && overrideImages[index]) return overrideImages[index];
-  if (index === total - 1 || action === 'final') return recipe.image;
-  return getFallbackStepImage(recipe, action);
-}
-
-function decorateRecipe(recipe) {
-  const mainImages = getMainIngredientImages(recipe);
-  const fallbackImage = mainImages[0] || recipe.image;
-  const decoratedIngredients = recipe.ingredients.map((item, index) => ({
-    ...item,
-    image: getIngredientImage(item.name) || recipe.image || fallbackImage
-  }));
-  const decoratedSteps = recipe.steps.map((text, index) => {
-    const action = getStepAction(text, index, recipe.steps.length);
-    return {
-      id: `step-${index + 1}`,
-      text,
-      action,
-      actionClass: `step-scene-${action}`,
-      image: getStepImage(text, recipe, action, index, recipe.steps.length)
-    };
-  });
-
+function copyDishForRelated(dish) {
   return {
-    ...recipe,
-    decoratedIngredients,
-    decoratedSteps,
-    difficultyText: getDifficultyText(recipe.difficulty)
+    ...dish,
+    image: dish.cover,
+    time: dish.totalTime || dish.time || 0,
+    tags: dish.tags || [],
+    reason: '相似灵感'
   };
+}
+
+function callCollect(action, dishId) {
+  return new Promise((resolve, reject) => {
+    if (!wx.cloud || !wx.cloud.callFunction) {
+      reject(new Error('cloud unavailable'));
+      return;
+    }
+    wx.cloud.callFunction({
+      name: 'manageCollect',
+      data: { action, dishId }
+    }).then((res) => {
+      if (!res.result || !res.result.ok) {
+        reject(new Error((res.result && res.result.message) || '收藏操作失败'));
+        return;
+      }
+      resolve(res.result);
+    }).catch(reject);
+  });
 }
 
 Page({
   data: {
+    dishId: '',
     recipe: null,
     loadFailed: false,
     isFavorite: false,
@@ -187,11 +141,11 @@ Page({
 
   onLoad(options) {
     enableShareMenu();
-    const recipe = getRecipeById(options.id);
-    if (!recipe) {
-      this.setData({
-        loadFailed: true
-      });
+    const dishId = String(options.dishId || options.id || '').trim();
+    this.setData({ dishId });
+
+    if (!dishId) {
+      this.setData({ loadFailed: true });
       wx.showToast({
         title: '菜谱不存在',
         icon: 'none'
@@ -200,33 +154,105 @@ Page({
       return;
     }
 
-    addHistory(recipe.id);
-    const relatedRecipes = recommendRecipes(recipe.mainIngredientIds, 4)
-      .filter((item) => item.id !== recipe.id)
-      .slice(0, 3);
+    const canUseCloud = Boolean(wx.cloud && wx.cloud.callFunction);
+    if (!canUseCloud) {
+      this.setData({
+        recipe: null,
+        isFavorite: false,
+        loadFailed: true
+      });
+      wx.showToast({
+        title: '云开发不可用',
+        icon: 'none'
+      });
+      return;
+    }
 
-    this.setData({
-      recipe: decorateRecipe(recipe),
-      isFavorite: isFavorite(recipe.id),
-      relatedRecipes
+    // 记录本地历史（兼容旧版本地菜谱）
+    try {
+      addHistory(dishId);
+    } catch (error) {
+      console.warn('addHistory 失败', error);
+    }
+
+    Promise.all([
+      wx.cloud.callFunction({ name: 'getDishDetail', data: { dishId } }),
+      callCollect('check', dishId).catch(() => ({ favorited: false }))
+    ]).then(([detailRes, collectRes]) => {
+      const dish = detailRes.result && detailRes.result.ok ? detailRes.result.data : null;
+      if (!dish) {
+        this.setData({ loadFailed: true });
+        wx.showToast({
+          title: '菜谱不存在',
+          icon: 'none'
+        });
+        setTimeout(() => wx.navigateBack(), 600);
+        return;
+      }
+      const favorited = Boolean(collectRes.favorited);
+      try {
+        if (favorited !== isFavorite(dishId)) toggleLocalFavorite(dishId, favorited);
+      } catch (error) {
+        console.warn('同步本地收藏状态失败', error);
+      }
+      this.setData({
+        recipe: withDisplayFields(dish),
+        isFavorite: favorited
+      });
+      this.loadRelated(dishId);
+    }).catch((error) => {
+      console.error('加载菜谱详情失败', error);
+      this.setData({ loadFailed: true });
+    });
+  },
+
+  loadRelated(currentId) {
+    if (!wx.cloud || !wx.cloud.callFunction) return;
+    wx.cloud.callFunction({
+      name: 'matchDishes',
+      data: { selectedIngredientIds: [], selectedToolIds: [], selectedTabooIds: [] }
+    }).then((res) => {
+      const all = (res.result && res.result.data) || [];
+      const related = all
+        .filter((item) => (item._id || item.id) !== currentId)
+        .slice(0, 3)
+        .map(copyDishForRelated);
+      this.setData({ relatedRecipes: related });
+    }).catch((error) => {
+      console.warn('加载相似灵感失败', error);
     });
   },
 
   toggleFavorite() {
-    const recipe = this.data.recipe;
-    const next = toggleFavorite(recipe.id);
-    this.setData({
-      isFavorite: next
-    });
-    wx.showToast({
-      title: next ? '已收藏' : '已取消',
-      icon: 'none'
+    const dishId = this.data.dishId;
+    const current = this.data.isFavorite;
+    callCollect('toggle', dishId).then((res) => {
+      const favorited = Boolean(res.favorited);
+      try {
+        toggleLocalFavorite(dishId, favorited);
+      } catch (error) {
+        console.warn('同步本地收藏状态失败', error);
+      }
+      this.setData({ isFavorite: favorited });
+      wx.showToast({
+        title: favorited ? '已收藏' : '已取消',
+        icon: 'none'
+      });
+    }).catch((error) => {
+      console.warn('收藏操作失败', error);
+      wx.showToast({
+        title: '收藏失败，请重试',
+        icon: 'none'
+      });
+      // 本地回退：避免与云端不同步
+      this.setData({ isFavorite: current });
     });
   },
 
   openRecipe(event) {
+    const id = event.currentTarget.dataset.id;
     wx.redirectTo({
-      url: `/packages/detail/detail/detail?id=${event.currentTarget.dataset.id}`
+      url: `/packages/detail/detail/detail?dishId=${encodeURIComponent(id)}`
     });
   },
 
@@ -235,7 +261,7 @@ Page({
     if (!recipe) return getDefaultShare();
     return getDefaultShare({
       title: `今晚有谱：${recipe.name}，照着做不慌`,
-      path: `/packages/detail/detail/detail?id=${recipe.id}`,
+      path: `/packages/detail/detail/detail?dishId=${encodeURIComponent(this.data.dishId)}`,
       imageUrl: recipe.image
     });
   },
@@ -245,7 +271,7 @@ Page({
     if (!recipe) return getTimelineShare();
     return getTimelineShare({
       title: `今晚有谱：${recipe.name}`,
-      path: `/packages/detail/detail/detail?id=${recipe.id}`,
+      path: `/packages/detail/detail/detail?dishId=${encodeURIComponent(this.data.dishId)}`,
       imageUrl: recipe.image
     });
   }
