@@ -81,7 +81,7 @@ function inferTools(recipe) {
 
 /**
  * 把老 recipe 转成云端 dishes 集合的一条文档。
- * 字段对应见 docs/数据开发记录.md 的字段字典。
+ * 字段对应见 docs/数据说明.md 的字段字典。
  */
 function toDishDoc(recipe) {
   const ingredients = (Array.isArray(recipe.ingredients) ? recipe.ingredients : []).map((item) => ({
