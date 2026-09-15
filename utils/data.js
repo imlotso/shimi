@@ -4,9 +4,14 @@ const ingredientCategories = [
   { id: 'common', name: '常用' },
   { id: 'vegetable', name: '蔬菜' },
   { id: 'protein', name: '肉蛋豆' },
+  { id: 'seafood', name: '海鲜水产' },
   { id: 'staple', name: '主食' },
-  { id: 'seasoning', name: '调味' }
+  { id: 'fruit', name: '水果' },
+  { id: 'seasoning', name: '调味' },
+  { id: 'tool', name: '厨具' },
+  { id: 'taboo', name: '忌口排除' }
 ];
+
 
 const ingredients = [
   { id: 'egg', name: '鸡蛋', category: 'protein', common: true, image: '/assets/images/ingredients/egg.jpg', aliases: ['蛋'] },
@@ -49,6 +54,19 @@ const ingredients = [
   { id: 'sichuan_pepper', name: '花椒', category: 'seasoning', common: false, image: '/assets/images/ingredients/sichuan_pepper.jpg', aliases: ['麻椒'] },
   { id: 'oyster_sauce', name: '蚝油', category: 'seasoning', common: false, image: '/assets/images/ingredients/oyster_sauce.jpg', aliases: [] },
   { id: 'doubanjiang', name: '豆瓣酱', category: 'seasoning', common: false, image: '/assets/images/ingredients/doubanjiang.jpg', aliases: ['郫县豆瓣'] }
+  
+];
+// 厨具
+const toolList = [
+  { id: 'wok', name: '炒锅', image: '/assets/images/tools/wok.png' },
+  { id: 'rice_cooker', name: '电饭煲', image: '/assets/images/tools/rice_cooker.png' },
+  { id: 'air_fryer', name: '空气炸锅', image: '/assets/images/tools/air_fryer.png' }
+];
+
+// 忌口
+const tabooList = [
+  { id: 'spicy', name: '不吃辣', image: '/assets/images/taboos/spicy.png' },
+  { id: 'seafood', name: '不吃海鲜', image: '/assets/images/taboos/seafood.png' }
 ];
 
 const recipes = [
@@ -1276,9 +1294,12 @@ const allRecipes = recipes
   .concat(catalogExtra.extraRecipes)
   .map(decorateIngredientAmounts);
 
-module.exports = {
-  ingredientCategories: catalogExtra.ingredientCategories,
-  ingredients: allIngredients,
-  recipes: allRecipes,
-  fatPlan
-};
+  module.exports = {
+    ingredientCategories: catalogExtra.ingredientCategories,
+    ingredients: allIngredients,
+    recipes: allRecipes,
+    fatPlan,
+    toolList,   // 新增
+    tabooList   // 新增
+  };
+  
