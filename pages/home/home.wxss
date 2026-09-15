@@ -1,7 +1,6 @@
 .home-page {
   padding-bottom: 58rpx;
 }
-
 .hero {
   position: relative;
   display: flex;
@@ -12,7 +11,6 @@
   color: #fffdf6;
   box-shadow: 0 24rpx 58rpx rgba(61, 44, 26, 0.18);
 }
-
 .hero::before {
   content: "";
   position: absolute;
@@ -22,21 +20,18 @@
   height: 8rpx;
   background: linear-gradient(90deg, #cde88f, #73c7be, #e58a65);
 }
-
 .hero-copy {
   position: relative;
   z-index: 2;
   width: 58%;
   padding: 40rpx 0 42rpx 36rpx;
 }
-
 .hero-kicker {
   display: block;
   color: #cde88f;
   font-size: 24rpx;
   font-weight: 800;
 }
-
 .hero-title {
   display: block;
   margin-top: 18rpx;
@@ -45,7 +40,6 @@
   font-weight: 900;
   letter-spacing: 0;
 }
-
 .hero-subtitle {
   display: block;
   width: 340rpx;
@@ -54,14 +48,12 @@
   font-size: 26rpx;
   line-height: 1.45;
 }
-
 .hero-tags {
   display: flex;
   flex-wrap: wrap;
   gap: 10rpx;
   margin-top: 26rpx;
 }
-
 .hero-tag {
   height: 42rpx;
   padding: 0 14rpx;
@@ -71,19 +63,14 @@
   font-size: 22rpx;
   line-height: 38rpx;
 }
-
 .hero-image {
   position: absolute;
   right: 24rpx;
-  bottom: 34rpx;
+  bottom: 30rpx;
   width: 284rpx;
   height: 214rpx;
-  border: 2rpx solid rgba(255, 253, 246, 0.13);
-  border-radius: 16rpx;
-  background: #e8ddcb;
-  box-shadow: 0 28rpx 58rpx rgba(0, 0, 0, 0.26);
+  border-radius: 14rpx;
 }
-
 .search-box {
   display: flex;
   align-items: center;
@@ -95,21 +82,18 @@
   background: #fffdf6;
   box-shadow: 0 16rpx 38rpx rgba(81, 59, 35, 0.07);
 }
-
 .search-icon {
   margin-right: 16rpx;
   color: #181713;
   font-size: 36rpx;
   font-weight: 800;
 }
-
 .search-input {
   flex: 1;
   height: 90rpx;
   color: #181713;
   font-size: 26rpx;
 }
-
 .search-button {
   display: flex;
   align-items: center;
@@ -121,60 +105,82 @@
   color: #181713;
   font-size: 26rpx;
   font-weight: 900;
+  margin:0;
+  padding:0;
+  border:none;
 }
 
+/* ========= 改为横向滚动：decision-scroll + decision-strip 【修改】 ========= */
+.decision-scroll{
+  width:100%;
+  margin-top:24rpx;
+}
 .decision-strip {
-  display: grid;
-  grid-template-columns: 1.45fr 1fr;
-  gap: 16rpx;
-  margin-top: 24rpx;
+  display: flex;
+  gap:16rpx;
+  padding:0 24rpx;
 }
-
 .decision-main,
 .decision-secondary {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  min-height: 136rpx;
-  padding: 0 28rpx;
-  border-radius: 16rpx;
-  text-align: left;
+  flex-shrink:0;
+  width:336rpx;
+  min-height:136rpx;
+  padding:0 28rpx;
+  border-radius:16rpx;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  text-align:left;
+  border:none;
+  margin:0;
 }
-
 .decision-main {
-  background: linear-gradient(135deg, #e96f4d, #c5533c);
+  background: linear-gradient(135deg, #e96f4c, #c4523b);
   color: #fffdf6;
-  box-shadow: 0 18rpx 38rpx rgba(182, 78, 50, 0.18);
+  box-shadow: 0 18rpx 36rpx rgba(182,74,47,0.16);
 }
-
 .decision-secondary {
-  background: linear-gradient(135deg, #e4f3f1, #d6eadc);
+  background: linear-gradient(135deg, #e3f3f1, #d5ebdd);
   color: #181713;
   box-shadow: inset 0 0 0 2rpx rgba(62, 108, 93, 0.08);
 }
-
 .decision-label {
   font-size: 30rpx;
   font-weight: 900;
 }
-
 .decision-copy {
   margin-top: 12rpx;
   opacity: 0.72;
   font-size: 24rpx;
 }
+.decision-taboo {
+  flex-shrink:0;
+  width:336rpx;
+  min-height:136rpx;
+  padding:0 28rpx;
+  border-radius:16rpx;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  text-align:left;
+  border:none;
+  margin:0;
+  background:#ffe8d6;
+  color:#181713;
+}
 
+
+/* --------下面全部是你原来的样式，原样保留-------- */
 .ingredient-scroll {
   width: 100%;
   white-space: nowrap;
+  margin-top:24rpx;
 }
-
 .ingredient-row {
   display: flex;
   gap: 14rpx;
-  padding-bottom: 4rpx;
+  padding:0 24rpx 4rpx;
 }
-
 .ingredient-column {
   display: flex;
   flex-direction: column;
@@ -182,7 +188,6 @@
   width: 160rpx;
   gap: 14rpx;
 }
-
 .ingredient-chip {
   display: flex;
   align-items: center;
@@ -196,20 +201,18 @@
   color: #181713;
   font-size: 24rpx;
   font-weight: 800;
+  margin:0;
 }
-
 .ingredient-chip.active {
   border-color: rgba(89, 118, 52, 0.34);
   background: #eaf4d6;
   box-shadow: inset 0 0 0 2rpx rgba(205, 232, 143, 0.65);
 }
-
 .ingredient-chip-img {
   width: 46rpx;
   height: 46rpx;
   flex: 0 0 46rpx;
 }
-
 .ingredient-chip text {
   min-width: 0;
   overflow: hidden;
@@ -221,9 +224,8 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 16rpx;
-  margin-top: 28rpx;
+  margin: 28rpx 24rpx 0;
 }
-
 .tool-card {
   min-height: 172rpx;
   padding: 22rpx 16rpx;
@@ -231,20 +233,17 @@
   text-align: left;
   border: 2rpx solid rgba(70, 52, 34, 0.06);
   box-shadow: 0 14rpx 32rpx rgba(81, 59, 35, 0.06);
+  margin:0;
 }
-
 .tool-card.green {
   background: linear-gradient(145deg, #f3f8e7, #e6f2d1);
 }
-
 .tool-card.blue {
   background: linear-gradient(145deg, #edf8f7, #dcefed);
 }
-
 .tool-card.coral {
   background: linear-gradient(145deg, #fff4ec, #f6e3d8);
 }
-
 .tool-symbol {
   display: flex;
   align-items: center;
@@ -257,14 +256,12 @@
   font-size: 28rpx;
   font-weight: 900;
 }
-
 .tool-title {
   display: block;
   margin-top: 20rpx;
   font-size: 28rpx;
   font-weight: 900;
 }
-
 .tool-copy {
   display: block;
   margin-top: 8rpx;
@@ -273,33 +270,36 @@
   line-height: 1.3;
 }
 
+.section-head {
+  margin:36rpx 24rpx 16rpx;
+}
 .recipe-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 18rpx;
+  padding:0 24rpx;
 }
-
 .home-recipe {
   width: 100%;
   text-align: left;
+  border-radius:16rpx;
+  overflow:hidden;
+  background:#fffdf6;
   box-shadow: 0 20rpx 48rpx rgba(81, 59, 35, 0.08);
 }
-
 .home-recipe-img {
   height: 198rpx;
+  width:100%;
 }
-
 .home-recipe-body {
   padding: 18rpx;
 }
-
 .home-recipe-line {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10rpx;
 }
-
 .home-recipe-name {
   flex: 1;
   overflow: hidden;
@@ -308,13 +308,11 @@
   font-size: 29rpx;
   font-weight: 900;
 }
-
 .home-recipe-time {
   color: #d86546;
   font-size: 21rpx;
   font-weight: 900;
 }
-
 .home-recipe-sub {
   display: -webkit-box;
   min-height: 66rpx;
@@ -326,4 +324,25 @@
   text-overflow: ellipsis;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
+}
+
+.scroll-hint {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: row;  /* 水平一行，不要column */
+  align-items: center;
+  justify-content: center;
+  padding: 0 20rpx 0 10rpx;
+  color: #b5a591;
+}
+
+.scroll-hint-text {
+  font-size: 22rpx;
+  margin-right: 4rpx; /* 文字和箭头中间间距 */
+}
+
+.scroll-hint-icon {
+  font-size: 40rpx;
+  font-weight: 700;
+  color: #c5704e;
 }
