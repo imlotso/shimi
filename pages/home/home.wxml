@@ -12,73 +12,28 @@
     </view>
     <image wx:if="{{heroRecipe}}" class="hero-image" src="{{heroRecipe.image}}" mode="aspectFill" />
   </view>
-
-  <view class="search-box">
-    <text class="search-icon">⌕</text>
-    <input
-      class="search-input"
-      placeholder="搜菜名或食材"
-      value="{{searchText}}"
-      confirm-type="search"
-      bindinput="onSearchInput"
-      bindconfirm="goSearch"
-    />
-    <button class="search-button" bindtap="goSearch">搜索</button>
-  </view>
-
+  <scroll-view class="decision-scroll" scroll-x enable-flex scroll-with-animation>
   <view class="decision-strip">
     <button class="decision-main" bindtap="goRecommendations">
-      <text class="decision-label">用已选食材配一餐</text>
-      <text class="decision-copy">{{selectedIds.length ? '查看今晚推荐' : '先去选食材'}}</text>
+      <text class="decision-label">选食材、工具配一餐</text>
+      <text class="decision-copy">先去选择食材</text>
+    </button>
+    <button class="decision-taboo" bindtap="goTaboo">
+      <text class="decision-label">根据忌口推荐</text>
+      <text class="decision-copy">精准避雷</text>
     </button>
     <button class="decision-secondary" bindtap="goFatLoss">
       <text class="decision-label">减脂轻食</text>
       <text class="decision-copy">低油高蛋白</text>
     </button>
   </view>
-
+</scroll-view>
+<view class="scroll-hint">
+  <text class="scroll-hint-text">滑动</text>
+  <text class="scroll-hint-icon">›</text>
+</view>
   <view class="section-head">
-    <text class="section-title">常用食材</text>
-    <button class="section-action" bindtap="goIngredients">更多食材</button>
-  </view>
-  <scroll-view scroll-x class="ingredient-scroll" enable-flex>
-    <view class="ingredient-row">
-      <view wx:for="{{quickIngredientColumns}}" wx:key="id" class="ingredient-column">
-        <button
-          wx:for="{{item.items}}"
-          wx:for-item="ingredient"
-          wx:key="id"
-          class="ingredient-chip {{ingredient.selected ? 'active' : ''}}"
-          data-id="{{ingredient.id}}"
-          bindtap="toggleIngredient"
-        >
-          <image class="ingredient-chip-img" src="{{ingredient.image}}" mode="aspectFit" />
-          <text>{{ingredient.name}}</text>
-        </button>
-      </view>
-    </view>
-  </scroll-view>
-
-  <view class="tool-grid">
-    <button class="tool-card green" bindtap="goIngredients">
-      <text class="tool-symbol">+</text>
-      <text class="tool-title">冰箱盘点</text>
-      <text class="tool-copy">把现有食材点出来</text>
-    </button>
-    <button class="tool-card blue" bindtap="goSearch">
-      <text class="tool-symbol">⌕</text>
-      <text class="tool-title">菜名直达</text>
-      <text class="tool-copy">想吃什么直接搜</text>
-    </button>
-    <button class="tool-card coral" bindtap="goFatLoss">
-      <text class="tool-symbol">↗</text>
-      <text class="tool-title">轻食计划</text>
-      <text class="tool-copy">今天吃轻一点</text>
-    </button>
-  </view>
-
-  <view class="section-head">
-    <text class="section-title">今晚高胜率</text>
+    <text class="section-title">今晚高现率</text>
     <button class="section-action" bindtap="goSearch">全部菜谱</button>
   </view>
   <view class="recipe-grid">

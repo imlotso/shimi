@@ -3,7 +3,6 @@
   padding: 24rpx 24rpx 236rpx;
   background: #f4efe4;
 }
-
 .search-shell {
   display: flex;
   align-items: center;
@@ -14,19 +13,16 @@
   background: #fffdf6;
   box-shadow: 0 14rpx 34rpx rgba(81, 59, 35, 0.06);
 }
-
 .search-mark {
   margin-right: 14rpx;
   font-size: 34rpx;
   font-weight: 900;
 }
-
 .ingredient-search {
   flex: 1;
   height: 86rpx;
   font-size: 26rpx;
 }
-
 .clear-search {
   display: flex;
   align-items: center;
@@ -39,7 +35,6 @@
   font-size: 24rpx;
   font-weight: 800;
 }
-
 .selector-layout {
   display: grid;
   grid-template-columns: 158rpx 1fr;
@@ -47,12 +42,10 @@
   height: calc(100vh - 348rpx);
   margin-top: 22rpx;
 }
-
 .category-rail {
   height: 100%;
   border-right: 2rpx solid rgba(70, 52, 34, 0.08);
 }
-
 .category-tab {
   display: flex;
   align-items: center;
@@ -66,23 +59,21 @@
   font-weight: 800;
   text-align: left;
 }
-
 .category-tab.active {
   background: #181713;
   color: #fffdf6;
 }
-
 .ingredient-list {
   height: 100%;
+  padding-bottom: 260rpx;
+  box-sizing: border-box;
 }
-
 .ingredient-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14rpx;
   padding-bottom: 30rpx;
 }
-
 .ingredient-item {
   display: grid;
   position: relative;
@@ -96,22 +87,18 @@
   text-align: left;
   box-shadow: 0 12rpx 28rpx rgba(81, 59, 35, 0.05);
 }
-
 .ingredient-item.selected {
   border-color: rgba(89, 118, 52, 0.34);
   background: #eaf4d6;
   box-shadow: inset 0 0 0 2rpx rgba(205, 232, 143, 0.62);
 }
-
 .ingredient-img {
   width: 50rpx;
   height: 50rpx;
 }
-
 .ingredient-info {
   min-width: 0;
 }
-
 .ingredient-name {
   display: block;
   overflow: hidden;
@@ -121,14 +108,12 @@
   white-space: nowrap;
   text-overflow: ellipsis;
 }
-
 .ingredient-status {
   display: block;
   margin-top: 8rpx;
   color: #81786b;
   font-size: 20rpx;
 }
-
 .ingredient-plus {
   position: absolute;
   right: 12rpx;
@@ -145,69 +130,114 @@
   font-size: 24rpx;
   font-weight: 900;
 }
-
+.empty-state {
+  padding: 80rpx 0;
+  text-align: center;
+}
+.empty-title {
+  display: block;
+  font-size: 28rpx;
+  font-weight: 900;
+  color: #181713;
+}
+.empty-copy {
+  display: block;
+  margin-top: 10rpx;
+  font-size: 24rpx;
+  color: #81786b;
+}
+.side-panel-wrap {
+  padding: 0;
+}
+/* ========== 底部固定已选标签栏 ========== */
 .selected-dock {
   position: fixed;
   right: 0;
   bottom: 0;
   left: 0;
   z-index: 10;
-  padding: 18rpx 24rpx 28rpx;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 24rpx 24rpx 32rpx;
+  background: rgba(255, 251, 240, 0.97);
   border-top: 2rpx solid rgba(70, 52, 34, 0.08);
-  background: rgba(255, 253, 246, 0.97);
-  box-shadow: 0 -14rpx 38rpx rgba(81, 59, 35, 0.08);
+  box-shadow: 0 -14rpx 34rpx rgba(81, 59, 35, 0.07);
 }
-
 .selected-head {
   display: flex;
+  flex-direction: row;
   align-items: center;
-  justify-content: space-between;
+  gap:20rpx;
+  margin-bottom: 18rpx;
+  overflow: visible;
 }
-
 .selected-count {
-  font-size: 24rpx;
-  font-weight: 900;
-}
-
-.selected-clear {
-  color: #d86546;
-  font-size: 24rpx;
-  font-weight: 800;
-}
-
-.selected-scroll {
-  margin: 14rpx 0 18rpx;
+  flex-shrink: 0;
   white-space: nowrap;
 }
-
-.selected-row {
-  display: flex;
-  gap: 12rpx;
+.selected-clear {
+  flex-shrink: 0;
+  font-size: 28rpx;
+  color: #d85030;
+  font-weight: 800;
+  line-height: 1.2;
+  margin-right: -14rpx;
+  white-space: nowrap;
 }
-
+.selected-scroll {
+  margin: 18rpx 0 22rpx;
+  white-space: nowrap;
+}
+.selected-row {
+  display: inline-flex;
+  gap: 12rpx;
+  flex-wrap: nowrap;
+}
 .selected-pill {
   display: inline-flex;
   align-items: center;
-  gap: 8rpx;
+  justify-content: space-between;
+  gap: 10rpx;
   height: 58rpx;
-  padding: 0 14rpx 0 8rpx;
+  padding: 0 14rpx 0 12rpx;
   border-radius: 12rpx;
-  background: #eef5df;
-  color: #181713;
+  background: #eef5dd;
+  color: #181818;
   font-size: 24rpx;
   font-weight: 800;
+  flex-shrink: 1;
+  min-width: 0;
+  max-width: 225rpx;
+  white-space: nowrap;
+  border: none;
 }
-
 .selected-img {
-  width: 42rpx;
-  height: 42rpx;
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 6rpx;
+  flex-shrink: 0;
 }
-
+.selected-pill text {
+  display: inline-block;
+  line-height: 58rpx;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .selected-x {
-  color: #81786b;
   font-size: 28rpx;
+  color: #666;
+  line-height: 58rpx;
+  flex-shrink: 0;
 }
-
 .selected-action {
   width: 100%;
+  border-radius: 14rpx;
+  height: 84rpx;
+  background: #a4d65e;
+  color: #2c4410;
+  font-size: 32rpx;
+  font-weight: 900;
+  border: none;
 }

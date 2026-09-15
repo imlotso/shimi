@@ -1,4 +1,5 @@
 <view class="ingredient-page">
+  <!-- 搜索框 -->
   <view class="search-shell">
     <text class="search-mark">⌕</text>
     <input
@@ -10,8 +11,8 @@
     />
     <button wx:if="{{query}}" class="clear-search" bindtap="clearSearch">清空</button>
   </view>
-
   <view class="selector-layout">
+    <!-- 左侧分类栏 -->
     <scroll-view class="category-rail" scroll-y>
       <button
         wx:for="{{categories}}"
@@ -22,46 +23,132 @@
       >
         {{item.name}}
       </button>
+      <!-- 厨具 -->
+      <button
+        class="category-tab {{activeCategory === '__tool__' ? 'active' : ''}}"
+        data-id="__tool__"
+        bindtap="switchCategory"
+      >
+        厨具
+      </button>
+      <!-- 忌口排除 -->
+      <button
+        class="category-tab {{activeCategory === '__taboo__' ? 'active' : ''}}"
+        data-id="__taboo__"
+        bindtap="switchCategory"
+      >
+        忌口排除
+      </button>
     </scroll-view>
-
+    <!-- 右侧内容区 -->
     <scroll-view class="ingredient-list" scroll-y>
-      <view class="ingredient-grid">
-        <view
-          wx:for="{{visibleIngredients}}"
-          wx:key="id"
-          class="ingredient-item {{item.selected ? 'selected' : ''}}"
-          hover-class="tap-card"
-          data-id="{{item.id}}"
-          bindtap="toggleIngredient"
-        >
-          <image class="ingredient-img" src="{{item.image}}" mode="aspectFit" />
-          <view class="ingredient-info">
-            <text class="ingredient-name">{{item.name}}</text>
-            <text class="ingredient-status">{{item.selected ? '已放入餐盘' : '点一下加入'}}</text>
+      <!-- 普通食材列表 -->
+      <view wx:if="{{activeCategory !== '__tool__' && activeCategory !== '__taboo__'}}">
+        <view class="ingredient-grid">
+          <view
+            wx:for="{{visibleIngredients}}"
+            wx:key="id"
+            class="ingredient-item {{item.selected ? 'selected' : ''}}"
+            hover-class="tap-card"
+            data-id="{{item.id}}"
+            bindtap="toggleIngredient"
+          >
+            <image class="ingredient-img" src="{{item.image}}" mode="aspectFit" />
+            <view class="ingredient-info">
+              <text class="ingredient-name">{{item.name}}</text>
+              <text class="ingredient-status">{{item.selected ? '已放入餐盘' : '点一下加入'}}</text>
+            </view>
+            <text class="ingredient-plus">{{item.selected ? '✓' : '+'}}</text>
           </view>
-          <text class="ingredient-plus">{{item.selected ? '✓' : '+'}}</text>
+        </view>
+        <view wx:if="{{!visibleIngredients.length}}" class="empty-state">
+          <text class="empty-title">没有找到这个食材</text>
+          <text class="empty-copy">可以先换个常见叫法搜索，比如"西红柿"或"番茄"。</text>
         </view>
       </view>
-
-      <view wx:if="{{!visibleIngredients.length}}" class="empty-state">
-        <text class="empty-title">没有找到这个食材</text>
-        <text class="empty-copy">可以先换个常见叫法搜索，比如“西红柿”或“番茄”。</text>
+      <!-- 厨具面板 -->
+      <view wx:if="{{activeCategory === '__tool__'}}" class="side-panel-wrap">
+        <view class="ingredient-grid">
+          <view
+            wx:for="{{toolList}}"
+            wx:key="id"
+            class="ingredient-item {{item.selected ? 'selected' : ''}}"
+            hover-class="tap-card"
+            data-id="{{item.id}}"
+            bindtap="toggleTool"
+          >
+            <image class="ingredient-img" src="{{item.image}}" mode="aspectFit" />
+            <view class="ingredient-info">
+              <text class="ingredient-name">{{item.name}}</text>
+              <text class="ingredient-status">{{item.selected ? '已放入餐盘' : '点一下加入'}}</text>
+            </view>
+            <text class="ingredient-plus">{{item.selected ? '✓' : '+'}}</text>
+          </view>
+        </view>
+      </view>
+      <!-- 忌口面板 -->
+      <view wx:if="{{activeCategory === '__taboo__'}}" class="side-panel-wrap">
+        <view class="ingredient-grid">
+          <view
+            wx:for="{{tabooList}}"
+            wx:key="id"
+            class="ingredient-item {{item.selected ? 'selected' : ''}}"
+            hover-class="tap-card"
+            data-id="{{item.id}}"
+            bindtap="toggleTaboo"
+          >
+            <image class="ingredient-img" src="{{item.image}}" mode="aspectFit" />
+            <view class="ingredient-info">
+              <text class="ingredient-name">{{item.name}}</text>
+              <text class="ingredient-status">{{item.selected ? '已放入餐盘' : '点一下加入'}}</text>
+            </view>
+            <text class="ingredient-plus">{{item.selected ? '✓' : '+'}}</text>
+          </view>
+        </view>
       </view>
     </scroll-view>
   </view>
-
+  <!-- 底部固定栏 -->
   <view class="selected-dock">
     <view class="selected-head">
-      <text class="selected-count">已选 {{selectedIds.length}} 种</text>
-      <button wx:if="{{selectedIds.length}}" class="selected-clear" bindtap="clearSelected">清空</button>
+      <text class="selected-count">已选食材 {{selectedIds.length}} 种｜厨具 {{tools.length}} 种｜忌口 {{taboos.length}} 种</text>
+      <button wx:if="{{selectedIds.length || tools.length || taboos.length}}" class="selected-clear" bindtap="clearAllSelect">清空</button>
     </view>
     <scroll-view scroll-x class="selected-scroll" enable-flex>
       <view class="selected-row">
+        <!-- 食材胶囊 -->
         <button
           wx:for="{{selectedIngredients}}"
           wx:key="id"
           class="selected-pill"
           data-id="{{item.id}}"
+          data-type="ingredient"
+          bindtap="removeSelected"
+        >
+          <image class="selected-img" src="{{item.image}}" mode="aspectFit" />
+          <text>{{item.name}}</text>
+          <text class="selected-x">×</text>
+        </button>
+        <!-- 忌口胶囊 -->
+        <button
+          wx:for="{{taboos}}"
+          wx:key="id"
+          class="selected-pill"
+          data-id="{{item.id}}"
+          data-type="taboo"
+          bindtap="removeSelected"
+        >
+          <image class="selected-img" src="{{item.image}}" mode="aspectFit" />
+          <text>{{item.name}}</text>
+          <text class="selected-x">×</text>
+        </button>
+        <!-- 厨具胶囊（和忌口完全一致） -->
+        <button
+          wx:for="{{tools}}"
+          wx:key="id"
+          class="selected-pill"
+          data-id="{{item.id}}"
+          data-type="tool"
           bindtap="removeSelected"
         >
           <image class="selected-img" src="{{item.image}}" mode="aspectFit" />
@@ -70,6 +157,6 @@
         </button>
       </view>
     </scroll-view>
-    <button class="solid-button green selected-action" bindtap="goRecommendations">查看今晚能做什么</button>
+    <button class="solid-button green selected-action" bindtap="onStartMatch">开始匹配</button>
   </view>
 </view>

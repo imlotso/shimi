@@ -1,12 +1,14 @@
 {
-  "pages": [
+  "pages":[
     "pages/home/home",
     "pages/ingredients/ingredients",
     "pages/recommendations/recommendations",
     "pages/search/search",
     "pages/fatloss/fatloss",
-    "pages/profile/profile"
-  ],
+    "pages/profile/profile",
+    "pages/tabooSelect/tabooSelect"
+  ]
+  ,
   "subPackages": [
     {
       "root": "packages/detail",

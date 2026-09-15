@@ -1,0 +1,19 @@
+<view class="page">
+  <view class="title">选择你需要避开的食材</view>
+  <view class="tip">选择忌口，系统将为你过滤含该食材的菜谱</view>
+
+  <view class="grid">
+    <view wx:for="{{tabooList}}" wx:key="id"
+          class="card {{item.selected?'active':''}}"
+          bindtap="toggleTaboo"
+          data-id="{{item.id}}">
+      <image class="img" src="{{item.image}}" mode="aspectFit"></image>
+      <text class="name">{{item.name}}</text>
+      <text wx:if="{{item.selected}}" class="check">✓</text>
+    </view>
+  </view>
+
+  <view class="submit-wrap">
+    <button class="submit-btn" bindtap="submitTaboo">确认选择，查看菜谱</button>
+  </view>
+</view>
