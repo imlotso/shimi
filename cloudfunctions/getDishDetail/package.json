@@ -1,0 +1,9 @@
+{
+  "name": "get-dish-detail",
+  "version": "1.0.0",
+  "description": "Read a published dish or an authorized private dish.",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "^3.0.1"
+  }
+}
