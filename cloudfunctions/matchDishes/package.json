@@ -1,0 +1,9 @@
+{
+  "name": "match-dishes",
+  "version": "1.0.0",
+  "description": "Match published dishes by ingredients, tools and taboos.",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "^3.0.1"
+  }
+}
