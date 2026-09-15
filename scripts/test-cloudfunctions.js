@@ -24,9 +24,10 @@ assert.strictEqual(matchesDish(tomatoEgg, ['tomato'], ['炒锅'], []), false);
 assert.strictEqual(matchesDish(tomatoEgg, ['tomato'], ['炒锅'], []), false);
 // 缺厨具不命中
 assert.strictEqual(matchesDish(tomatoEgg, ['tomato', 'egg'], [], []), false);
-// 有忌口不命中
-assert.strictEqual(matchesDish(tomatoEgg, ['tomato', 'egg'], ['炒锅'], ['花生']), false);
+// 菜品声明忌口且用户选择相同忌口时不命中
 assert.strictEqual(matchesDish({ ...tomatoEgg, taboos: ['花生'] }, ['tomato', 'egg'], ['炒锅'], ['花生']), false);
+// 菜品未声明忌口时，用户忌口不影响匹配
+assert.strictEqual(matchesDish(tomatoEgg, ['tomato', 'egg'], ['炒锅'], ['花生']), true);
 // tools 为空时不受厨具限制
 assert.strictEqual(matchesDish({ ...tomatoEgg, tools: [] }, ['tomato', 'egg'], [], []), true);
 // 别名匹配：西红柿、蛋

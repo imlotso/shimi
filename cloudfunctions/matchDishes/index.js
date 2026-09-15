@@ -220,9 +220,9 @@ function projectDish(dish) {
 
 exports.matchesDish = matchesDish;
 exports.main = async (event = {}) => {
-  const selectedIngredientIds = asStringArray(event.selectedIngredientIds);
-  const selectedToolIds = asStringArray(event.selectedToolIds);
-  const selectedTabooIds = asStringArray(event.selectedTabooIds);
+  const selectedIngredientIds = asStringArray(event.selectedIngredientIds || event.ingredients);
+  const selectedToolIds = asStringArray(event.selectedToolIds || event.tools);
+  const selectedTabooIds = asStringArray(event.selectedTabooIds || event.taboos);
 
   const result = await db.collection('dishes').where({ auditStatus: 1 }).limit(100).get();
   const dishes = result.data
