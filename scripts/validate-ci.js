@@ -111,6 +111,7 @@ const ALLOWED_DISH_FIELDS = new Set([
   'openid', 'auditStatus', 'rejectReason'
 ]);
 
+const repoRoot = path.join(__dirname, '..');
 const seedScriptPath = path.join(__dirname, 'seed-dishes.js');
 if (fs.existsSync(seedScriptPath)) {
   try {
@@ -131,7 +132,14 @@ if (fs.existsSync(seedScriptPath)) {
         seenIds.add(id);
 
         if (!dish.name || typeof dish.name !== 'string') errors.push(`[数据] ${id} 缺失必填字符串 name`);
-        if (!dish.cover || typeof dish.cover !== 'string') errors.push(`[数据] ${id} 缺失必填字符串 cover`);
+        if (!dish.cover || typeof dish.cover !== 'string') {
+          errors.push(`[数据] ${id} 缺失必填字符串 cover`);
+        } else if (dish.cover.startsWith('/assets/')) {
+          const coverPath = path.join(repoRoot, dish.cover.slice(1));
+          if (!fs.existsSync(coverPath)) {
+            errors.push(`[资源] ${id} cover 文件不存在: ${dish.cover}`);
+          }
+        }
         if (!Number.isInteger(dish.totalTime) || dish.totalTime <= 0) {
           errors.push(`[数据] ${id} totalTime 必须为正整数 (分钟)`);
         }
@@ -140,6 +148,12 @@ if (fs.existsSync(seedScriptPath)) {
         // 厨具校验 (必须为非空数组)
         if (!Array.isArray(dish.tools) || dish.tools.length === 0) {
           errors.push(`[数据] ${id} tools 必须为非空字符串数组`);
+        } else {
+          dish.tools.forEach((tool) => {
+            if (typeof tool !== 'string' || !tool.trim()) {
+              errors.push(`[数据] ${id} tools 存在空值或非字符串项`);
+            }
+          });
         }
 
         // 食材校验
@@ -176,7 +190,22 @@ if (fs.existsSync(seedScriptPath)) {
           }
         }
       });
-      console.log(`✅ [数据] 成功校验 ${dishes.length} 条菜谱，字段与 V1 规范 100% 吻合 (ingredients=${ingredients.length}, tools=${tools.length})`);
+      if (dishes.length !== 95) {
+        warnings.push(`[数据] 当前 dishes=${dishes.length}，任务卡 3 预期核查 95 条菜谱`);
+      }
+      const toolNames = new Set(tools.map((tool) => tool && tool.name));
+      const missingTools = new Set();
+      let stepCount = 0;
+      dishes.forEach((dish) => {
+        (dish.tools || []).forEach((tool) => {
+          if (!toolNames.has(tool)) missingTools.add(tool);
+        });
+        stepCount += (dish.steps || []).length;
+      });
+      missingTools.forEach((tool) => {
+        errors.push(`[数据] ${tool} 未出现在 tools 字典集合中`);
+      });
+      console.log(`✅ [数据] 成功校验 ${dishes.length} 条菜谱，字段与 V1 规范 100% 吻合 (ingredients=${ingredients.length}, tools=${tools.length}, steps=${stepCount})`);
     }
   } catch (e) {
     errors.push(`[数据] 运行 seed-dishes.js 校验时出错: ${e.message}`);
