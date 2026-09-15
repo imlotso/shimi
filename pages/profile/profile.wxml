@@ -58,13 +58,13 @@
       wx:key="id"
       class="profile-recipe"
       hover-class="tap-card"
-      data-id="{{item.id}}"
+      data-id="{{item.id || item._id}}"
       bindtap="openRecipe"
     >
       <image class="profile-recipe-img" src="{{item.image}}" mode="aspectFill" />
       <view class="profile-recipe-body">
         <text class="profile-recipe-name">{{item.name}}</text>
-        <text class="profile-recipe-meta">{{item.time}} 分钟 · {{item.calories}} kcal · {{item.protein}}g 蛋白</text>
+        <text class="profile-recipe-meta">{{item.time}} 分钟{{item.calories ? ' · ' + item.calories + ' kcal' : ''}}</text>
       </view>
     </view>
   </view>

@@ -1,0 +1,9 @@
+{
+  "name": "manage-collect",
+  "version": "1.0.0",
+  "description": "List and toggle a user's collected dishes.",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "^3.0.1"
+  }
+}
