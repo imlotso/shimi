@@ -196,12 +196,14 @@ function taboosMatch(dishTaboos, selectedTabooIds) {
 }
 
 function matchesDish(dish, selectedIngredientIds, selectedToolIds, selectedTabooIds) {
+  const hasIngredientFilter = selectedIngredientIds.length > 0;
+  const hasToolFilter = selectedToolIds.length > 0;
   const selectedKeywords = resolveIngredientKeywords(selectedIngredientIds);
   const mainNames = getMainIngredientNames(dish);
-  const mainCovered = mainNames.length === 0 || mainNames.every((name) => isCovered(name, selectedKeywords));
-  return mainCovered
-    && toolsMatch(dish.tools, selectedToolIds)
-    && taboosMatch(dish.taboos, selectedTabooIds);
+  const mainCovered = !hasIngredientFilter
+    || (mainNames.length > 0 && mainNames.every((name) => isCovered(name, selectedKeywords)));
+  const toolsCovered = !hasToolFilter || toolsMatch(dish.tools, selectedToolIds);
+  return mainCovered && toolsCovered && taboosMatch(dish.taboos, selectedTabooIds);
 }
 
 function projectDish(dish) {

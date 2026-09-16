@@ -66,6 +66,7 @@ function withDisplayFields(dish) {
     return {
       id: `step-${index + 1}`,
       text,
+      time: typeof step === 'string' ? '' : (step.time || ''),
       action,
       actionClass: `step-scene-${action}`,
       image: index === steps.length - 1 ? dish.cover : ''
@@ -117,16 +118,19 @@ function callCollect(action, dishId) {
       reject(new Error('cloud unavailable'));
       return;
     }
-    wx.cloud.callFunction({
-      name: 'manageCollect',
-      data: { action, dishId }
-    }).then((res) => {
-      if (!res.result || !res.result.ok) {
-        reject(new Error((res.result && res.result.message) || '收藏操作失败'));
-        return;
-      }
-      resolve(res.result);
-    }).catch(reject);
+      wx.cloud.callFunction({
+        name: 'manageCollect',
+        data: {
+          action,
+          dishId
+        }
+      }).then((res) => {
+        if (!res.result || !res.result.ok) {
+          reject(new Error((res.result && res.result.message) || '收藏操作失败'));
+          return;
+        }
+        resolve(res.result);
+      }).catch(reject);
   });
 }
 
@@ -189,7 +193,7 @@ Page({
         setTimeout(() => wx.navigateBack(), 600);
         return;
       }
-      const favorited = Boolean(collectRes.favorited);
+      const favorited = Boolean(collectRes.favorited || (collectRes.data && collectRes.data.isCollected));
       try {
         if (favorited !== isFavorite(dishId)) toggleLocalFavorite(dishId, favorited);
       } catch (error) {
@@ -226,8 +230,10 @@ Page({
   toggleFavorite() {
     const dishId = this.data.dishId;
     const current = this.data.isFavorite;
-    callCollect('toggle', dishId).then((res) => {
-      const favorited = Boolean(res.favorited);
+    callCollect(current ? 'remove' : 'add', dishId).then((res) => {
+      const favorited = res.data && typeof res.data.isCollected === 'boolean'
+        ? res.data.isCollected
+        : !current;
       try {
         toggleLocalFavorite(dishId, favorited);
       } catch (error) {

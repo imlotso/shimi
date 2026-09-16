@@ -65,21 +65,12 @@ Page({
       this.setData({ favorites: local });
     };
 
-    listCollect().then((collectIds) => {
-      const idSet = new Set(collectIds);
-      wx.cloud.callFunction({
-        name: 'matchDishes',
-        data: { selectedIngredientIds: [], selectedToolIds: [], selectedTabooIds: [] }
-      }).then((res) => {
-        const all = (res.result && res.result.data) || [];
-        const favorites = all
-          .filter((dish) => idSet.has(dish._id))
-          .map(projectDish);
-        this.setData({ favorites });
-      }).catch((error) => {
-        console.warn('拉取收藏菜谱失败，使用本地收藏', error);
-        fallback();
-      });
+    listCollect().then((collectCards) => {
+      const cards = Array.isArray(collectCards) ? collectCards : [];
+      const favorites = cards
+        .map(projectDish)
+        .filter((dish) => dish.id);
+      this.setData({ favorites });
     }).catch((error) => {
       console.warn('拉取云端收藏失败，使用本地收藏', error);
       fallback();

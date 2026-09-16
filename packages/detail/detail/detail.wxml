@@ -36,8 +36,11 @@
       </view>
     </view>
 
-    <view class="tag-row detail-tags">
-      <text wx:for="{{recipe.tags}}" wx:key="*this" class="tag {{recipe.fatLoss ? 'green' : ''}}">{{item}}</text>
+    <view wx:if="{{recipe.tools.length}}" class="tag-row detail-tags">
+      <text wx:for="{{recipe.tools}}" wx:key="*this" class="tag">{{item}}</text>
+    </view>
+    <view wx:if="{{recipe.tags.length}}" class="tag-row detail-tags">
+      <text wx:for="{{recipe.tags}}" wx:key="*this" class="tag">{{item}}</text>
     </view>
   </view>
 
@@ -66,7 +69,10 @@
     <view class="step-list">
       <view wx:for="{{recipe.decoratedSteps}}" wx:key="id" class="step-item {{item.image ? 'with-image' : 'text-only'}}">
         <text class="step-number">{{index + 1}}</text>
-        <text class="step-copy">{{item.text}}</text>
+        <view class="step-copy-wrap">
+          <text class="step-copy">{{item.text}}</text>
+          <text wx:if="{{item.time}}" class="step-time">耗时 {{item.time}} 分钟</text>
+        </view>
         <view wx:if="{{item.image}}" class="step-visual {{item.actionClass}}">
           <image class="step-stage-img" src="{{item.image}}" mode="aspectFill" />
         </view>
