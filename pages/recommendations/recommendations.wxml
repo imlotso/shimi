@@ -30,7 +30,15 @@
     <text>{{noticeText}}</text>
   </view>
 
-  <view class="recommend-list" wx:if="{{recommendations.length}}">
+  <view wx:if="{{loading}}" class="empty-state">
+    <text class="empty-title">正在匹配…</text>
+  </view>
+  <view wx:elif="{{loadFailed && !recommendations.length}}" class="empty-state">
+    <text class="empty-title">加载失败</text>
+    <text class="empty-copy">请确认云函数已部署，稍后再试。</text>
+  </view>
+
+  <view wx:elif="{{recommendations.length}}" class="recommend-list">
     <view
       wx:for="{{recommendations}}"
       wx:key="id"
@@ -51,9 +59,8 @@
           <text class="meta-pill">{{item.missingText}}</text>
         </view>
         <view class="tag-row">
-          <text class="tag {{item.fatLoss ? 'green' : 'red'}}">{{item.fatLoss ? '减脂友好' : item.category}}</text>
-          <text class="tag blue">{{item.calories}} kcal</text>
-          <text class="tag">{{item.protein}}g 蛋白</text>
+          <text class="tag">{{item.category}}</text>
+          <text wx:for="{{item.tags}}" wx:for-item="tag" wx:key="*this" class="tag blue">{{tag}}</text>
         </view>
       </view>
     </view>

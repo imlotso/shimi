@@ -23,21 +23,24 @@
         <text class="metric-sub">分钟</text>
       </view>
       <view class="metric">
-        <text class="metric-main">{{recipe.difficulty}}</text>
-        <text class="metric-sub">难度</text>
+        <text class="metric-main">{{recipe.ingredients.length}}</text>
+        <text class="metric-sub">种食材</text>
       </view>
       <view class="metric">
-        <text class="metric-main">{{recipe.calories}}</text>
-        <text class="metric-sub">kcal 估计</text>
+        <text class="metric-main">{{recipe.steps.length}}</text>
+        <text class="metric-sub">步完成</text>
       </view>
       <view class="metric">
-        <text class="metric-main">{{recipe.protein}}g</text>
-        <text class="metric-sub">蛋白质</text>
+        <text class="metric-main">{{recipe.tools.length}}</text>
+        <text class="metric-sub">件厨具</text>
       </view>
     </view>
 
-    <view class="tag-row detail-tags">
-      <text wx:for="{{recipe.tags}}" wx:key="*this" class="tag {{recipe.fatLoss ? 'green' : ''}}">{{item}}</text>
+    <view wx:if="{{recipe.tools.length}}" class="tag-row detail-tags">
+      <text wx:for="{{recipe.tools}}" wx:key="*this" class="tag">{{item}}</text>
+    </view>
+    <view wx:if="{{recipe.tags.length}}" class="tag-row detail-tags">
+      <text wx:for="{{recipe.tags}}" wx:key="*this" class="tag">{{item}}</text>
     </view>
   </view>
 
@@ -66,7 +69,10 @@
     <view class="step-list">
       <view wx:for="{{recipe.decoratedSteps}}" wx:key="id" class="step-item {{item.image ? 'with-image' : 'text-only'}}">
         <text class="step-number">{{index + 1}}</text>
-        <text class="step-copy">{{item.text}}</text>
+        <view class="step-copy-wrap">
+          <text class="step-copy">{{item.text}}</text>
+          <text wx:if="{{item.time}}" class="step-time">耗时 {{item.time}} 分钟</text>
+        </view>
         <view wx:if="{{item.image}}" class="step-visual {{item.actionClass}}">
           <image class="step-stage-img" src="{{item.image}}" mode="aspectFill" />
         </view>
@@ -83,12 +89,12 @@
     <text class="section-title">相似灵感</text>
   </view>
   <view class="related-row">
-    <view
+      <view
       wx:for="{{relatedRecipes}}"
-      wx:key="id"
+      wx:key="_id"
       class="related-card"
       hover-class="tap-card"
-      data-id="{{item.id}}"
+      data-id="{{item._id}}"
       bindtap="openRecipe"
     >
       <image class="related-img" src="{{item.image}}" mode="aspectFill" />
