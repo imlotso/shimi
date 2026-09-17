@@ -1,13 +1,26 @@
-const { ingredients } = require('../../utils/data');
+const { ingredients, toolList, tabooList } = require('../../utils/data');
 const { enableShareMenu, getDefaultShare, getTimelineShare } = require('../../utils/share');
 
 const PAGE_SIZE = 6;
 
 function parseIds(value) {
-  return String(value || '')
+  let decoded = String(value || '');
+  try {
+    decoded = decodeURIComponent(decoded);
+  } catch (error) {
+    console.warn('推荐参数解码失败', error);
+  }
+  return decoded
     .split(',')
     .map((id) => id.trim())
     .filter(Boolean);
+}
+
+function normalizeNames(ids, catalog) {
+  return ids.map((id) => {
+    const item = catalog.find((entry) => entry.id === id || entry.name === id);
+    return item ? item.name : id;
+  });
 }
 
 function getSelectedIngredients(ids) {
@@ -41,6 +54,10 @@ function getNoticeText(selectedIds, recommendations) {
 Page({
   data: {
     selectedIds: [],
+    selectedToolIds: [],
+    selectedTabooIds: [],
+    selectedTools: [],
+    selectedTaboos: [],
     selectedIngredients: [],
     allRecommendations: [],
     recommendations: [],
@@ -57,8 +74,14 @@ Page({
     const selectedIds = parseIds(options.ids);
     const selectedToolIds = parseIds(options.tools);
     const selectedTabooIds = parseIds(options.taboos);
+    const selectedTools = normalizeNames(selectedToolIds, toolList);
+    const selectedTaboos = normalizeNames(selectedTabooIds, tabooList);
     this.setData({
       selectedIds,
+      selectedToolIds,
+      selectedTabooIds,
+      selectedTools,
+      selectedTaboos,
       selectedIngredients: getSelectedIngredients(selectedIds),
       allRecommendations: [],
       recommendations: [],
@@ -68,7 +91,7 @@ Page({
       loading: true,
       loadFailed: false
     });
-    this.fetchRecommendations(selectedIds, selectedToolIds, selectedTabooIds);
+    this.fetchRecommendations(selectedIds, selectedTools, selectedTaboos);
   },
 
   fetchRecommendations(selectedIds, selectedToolIds, selectedTabooIds) {

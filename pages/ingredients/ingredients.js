@@ -165,8 +165,13 @@ Page ({
     };
     console.log ('【云函数请求参数】', params);
     // tools、taboos现在是对象数组，跳转时提取id
+    const query = [
+      `ids=${encodeURIComponent(params.ingredients.join(','))}`,
+      `tools=${encodeURIComponent(params.tools.map((item) => item.id).join(','))}`,
+      `taboos=${encodeURIComponent(params.taboos.map((item) => item.id).join(','))}`
+    ].join('&');
     wx.navigateTo ({
-      url: `/pages/recommendations/recommendations?ids=${params.ingredients.join(',')}&tools=${params.tools.map(i=>i.id).join(',')}&taboos=${params.taboos.map(i=>i.id).join(',')}`
+      url: `/pages/recommendations/recommendations?${query}`
     });
   },
   goRecommendations () {
