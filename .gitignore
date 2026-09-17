@@ -9,4 +9,4 @@ project.private.config.json
 Thumbs.db
 *.log
 test-draw.png
-scripts/.generated/*.seed.json
+scripts/.generated/*.json
