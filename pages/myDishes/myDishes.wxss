@@ -1,0 +1,133 @@
+.mydishes-page {
+  padding-bottom: 80rpx;
+}
+
+.retry-btn {
+  margin: 28rpx auto 0;
+}
+
+.dish-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.dish-card {
+  display: flex;
+  overflow: hidden;
+  border: 2rpx solid rgba(70, 52, 34, 0.08);
+  border-radius: 16rpx;
+  background: #fffdf6;
+  box-shadow: 0 14rpx 32rpx rgba(81, 59, 35, 0.06);
+}
+
+.dish-card-img {
+  flex: 0 0 148rpx;
+  width: 148rpx;
+  height: 148rpx;
+  background: #e8ddcb;
+}
+
+.dish-card-body {
+  flex: 1;
+  min-width: 0;
+  padding: 18rpx 20rpx;
+}
+
+.dish-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12rpx;
+}
+
+.dish-card-name {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 30rpx;
+  font-weight: 900;
+}
+
+.dish-card-meta {
+  display: block;
+  margin-top: 10rpx;
+  color: #81786b;
+  font-size: 23rpx;
+}
+
+.status-tag {
+  flex: 0 0 auto;
+  height: 42rpx;
+  padding: 0 14rpx;
+  border-radius: 999rpx;
+  font-size: 22rpx;
+  line-height: 42rpx;
+  font-weight: 800;
+}
+
+.status-tag.pending {
+  background: #f7efd8;
+  color: #8a6d1f;
+}
+
+.status-tag.published {
+  background: #eaf4d6;
+  color: #49652a;
+}
+
+.status-tag.rejected {
+  background: #f9e4d8;
+  color: #bd573c;
+}
+
+.reject-reason {
+  display: flex;
+  margin-top: 12rpx;
+  padding: 12rpx 14rpx;
+  border-radius: 10rpx;
+  background: #fdf1ea;
+  font-size: 23rpx;
+  line-height: 1.5;
+}
+
+.reject-reason-title {
+  flex: 0 0 auto;
+  color: #bd573c;
+  font-weight: 800;
+}
+
+.reject-reason-text {
+  color: #8a5a46;
+}
+
+.dish-card-actions {
+  display: flex;
+  gap: 12rpx;
+  margin-top: 16rpx;
+}
+
+.mini-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 56rpx;
+  padding: 0 20rpx;
+  border-radius: 10rpx;
+  font-size: 24rpx;
+  font-weight: 800;
+}
+
+.mini-btn.ghost {
+  border: 2rpx solid rgba(24, 23, 19, 0.16);
+  color: #343129;
+}
+
+.mini-btn.danger {
+  border: 2rpx solid rgba(189, 87, 60, 0.35);
+  color: #bd573c;
+}
+
+.empty-copy {
+  padding: 0 20rpx;
+}
