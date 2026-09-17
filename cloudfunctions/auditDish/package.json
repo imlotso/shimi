@@ -1,0 +1,9 @@
+{
+  "name": "audit-dish",
+  "version": "1.0.0",
+  "description": "Approve or reject dishes and write audit logs.",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "^3.0.1"
+  }
+}
