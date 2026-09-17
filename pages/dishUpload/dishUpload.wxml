@@ -1,0 +1,143 @@
+<view class="page upload-page">
+  <view class="section-head">
+    <text class="section-title">基本信息</text>
+  </view>
+
+  <view class="field">
+    <text class="field-label">菜名</text>
+    <input
+      class="field-input"
+      value="{{name}}"
+      placeholder="比如：番茄炒蛋"
+      placeholder-class="field-placeholder"
+      bindinput="onNameInput"
+    />
+  </view>
+
+  <view class="field-row">
+    <view class="field half">
+      <text class="field-label">总用时（分钟）</text>
+      <input
+        class="field-input"
+        type="number"
+        value="{{totalTime}}"
+        placeholder="如 15"
+        placeholder-class="field-placeholder"
+        bindinput="onTotalTimeInput"
+      />
+    </view>
+    <view class="field half">
+      <text class="field-label">标签（逗号分隔）</text>
+      <input
+        class="field-input"
+        value="{{tags}}"
+        placeholder="快手菜,下饭"
+        placeholder-class="field-placeholder"
+        bindinput="onTagsInput"
+      />
+    </view>
+  </view>
+
+  <view class="field">
+    <text class="field-label">封面图</text>
+    <view class="cover-picker" bindtap="chooseCover">
+      <image wx:if="{{coverTemp}}" class="cover-preview" src="{{coverTemp}}" mode="aspectFill" />
+      <view wx:else class="cover-placeholder">
+        <text class="cover-placeholder-plus">＋</text>
+        <text class="cover-placeholder-copy">选择或拍一张成品图</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="section-head">
+    <text class="section-title">厨具与忌口</text>
+  </view>
+  <view class="field">
+    <text class="field-label">需要哪些厨具</text>
+    <view class="chip-row">
+      <view
+        wx:for="{{toolList}}"
+        wx:key="id"
+        class="chip {{item.selected ? 'active' : ''}}"
+        data-id="{{item.id}}"
+        bindtap="toggleTool"
+      >{{item.name}}</view>
+    </view>
+  </view>
+  <view class="field">
+    <text class="field-label">含哪些忌口（没有可不选）</text>
+    <view class="chip-row">
+      <view
+        wx:for="{{tabooList}}"
+        wx:key="id"
+        class="chip {{item.selected ? 'active' : ''}} tick"
+        data-id="{{item.id}}"
+        bindtap="toggleTaboo"
+      >{{item.name}}</view>
+    </view>
+  </view>
+
+  <view class="section-head">
+    <text class="section-title">食材清单</text>
+    <text class="section-action" bindtap="addIngredient">＋ 添加食材</text>
+  </view>
+  <view class="dynamic-list">
+    <view wx:for="{{ingredients}}" wx:key="index" class="dynamic-row">
+      <input
+        class="dynamic-input grow"
+        value="{{item.name}}"
+        data-index="{{index}}"
+        placeholder="食材名"
+        placeholder-class="field-placeholder"
+        bindinput="onIngredientNameInput"
+      />
+      <input
+        class="dynamic-input"
+        value="{{item.num}}"
+        data-index="{{index}}"
+        placeholder="用量"
+        placeholder-class="field-placeholder"
+        bindinput="onIngredientNumInput"
+      />
+      <text wx:if="{{ingredients.length > 1}}" class="dynamic-remove" data-index="{{index}}" bindtap="removeIngredient">删除</text>
+    </view>
+  </view>
+
+  <view class="section-head">
+    <text class="section-title">一步步做</text>
+    <text class="section-action" bindtap="addStep">＋ 添加步骤</text>
+  </view>
+  <view class="dynamic-list">
+    <view wx:for="{{steps}}" wx:key="index" class="step-row">
+      <view class="step-row-head">
+        <text class="step-row-index">第 {{index + 1}} 步</text>
+        <text wx:if="{{steps.length > 1}}" class="dynamic-remove" data-index="{{index}}" bindtap="removeStep">删除</text>
+      </view>
+      <textarea
+        class="step-desc"
+        value="{{item.desc}}"
+        data-index="{{index}}"
+        placeholder="这一步怎么操作"
+        placeholder-class="field-placeholder"
+        auto-height
+        bindinput="onStepDescInput"
+      />
+      <input
+        class="dynamic-input step-time"
+        type="number"
+        value="{{item.time}}"
+        data-index="{{index}}"
+        placeholder="耗时(分钟)"
+        placeholder-class="field-placeholder"
+        bindinput="onStepTimeInput"
+      />
+    </view>
+  </view>
+
+  <button
+    class="solid-button green submit-bar"
+    loading="{{submitting}}"
+    disabled="{{submitting}}"
+    bindtap="submit"
+  >{{submitting ? '提交中' : (editingId ? '保存修改' : '提交审核')}}</button>
+</view>

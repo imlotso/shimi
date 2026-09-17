@@ -1,0 +1,60 @@
+<view class="page audit-page">
+  <view wx:if="{{checked && !isAdmin}}" class="empty-state">
+    <text class="empty-title">无审核权限</text>
+    <text class="empty-copy">只有管理员才能进入审核管理。</text>
+  </view>
+
+  <block wx:elif="{{isAdmin}}">
+    <view class="section-head">
+      <text class="section-title">待审核菜谱</text>
+      <text class="section-action">{{dishes.length}} 份</text>
+    </view>
+
+    <view wx:if="{{loading}}" class="empty-state">
+      <text class="empty-title">正在加载</text>
+    </view>
+
+    <view wx:elif="{{loadFailed}}" class="empty-state">
+      <text class="empty-title">加载失败</text>
+      <text class="empty-copy">请检查网络后重试。</text>
+      <button class="ghost-button retry-btn" bindtap="loadPending">重试</button>
+    </view>
+
+    <view wx:elif="{{dishes.length}}" class="audit-list">
+      <view wx:for="{{dishes}}" wx:key="id" class="audit-card">
+        <image class="audit-card-img" src="{{item.image}}" mode="aspectFill" />
+        <view class="audit-card-body">
+          <text class="audit-card-name">{{item.name}}</text>
+          <text class="audit-card-meta">{{item.time}} 分钟 · {{item.ingredients.length}} 种食材 · {{item.steps.length}} 步</text>
+          <text wx:if="{{item.tagsText}}" class="audit-card-tags">{{item.tagsText}}</text>
+
+          <view class="audit-card-actions">
+            <button class="mini-btn ghost" data-id="{{item.id}}" bindtap="goPreview">预览</button>
+            <button class="mini-btn approve" data-id="{{item.id}}" bindtap="approve">通过</button>
+            <button class="mini-btn danger" data-id="{{item.id}}" bindtap="startReject">驳回</button>
+          </view>
+
+          <view wx:if="{{item.rejecting}}" class="reject-box">
+            <input
+              class="reject-input"
+              value="{{item.rejectReason}}"
+              data-id="{{item.id}}"
+              placeholder="填写驳回原因（必填）"
+              placeholder-class="field-placeholder"
+              bindinput="onRejectReasonInput"
+            />
+            <view class="reject-actions">
+              <button class="mini-btn ghost" data-id="{{item.id}}" bindtap="cancelReject">取消</button>
+              <button class="mini-btn danger" data-id="{{item.id}}" bindtap="reject">确认驳回</button>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view wx:else class="empty-state">
+      <text class="empty-title">没有待审核的菜谱</text>
+      <text class="empty-copy">所有投稿都已处理完毕。</text>
+    </view>
+  </block>
+</view>

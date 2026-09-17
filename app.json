@@ -6,7 +6,10 @@
     "pages/search/search",
     "pages/fatloss/fatloss",
     "pages/profile/profile",
-    "pages/tabooSelect/tabooSelect"
+    "pages/tabooSelect/tabooSelect",
+    "pages/dishUpload/dishUpload",
+    "pages/myDishes/myDishes",
+    "pages/auditManage/auditManage"
   ]
   ,
   "subPackages": [

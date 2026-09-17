@@ -19,6 +19,21 @@
     </button>
   </view>
 
+  <view class="ugc-actions">
+    <button class="ugc-action" bindtap="goDishUpload">
+      <text class="ugc-action-title">传菜谱</text>
+      <text class="ugc-action-copy">分享你常做的菜</text>
+    </button>
+    <button class="ugc-action" bindtap="goMyDishes">
+      <text class="ugc-action-title">我的投稿</text>
+      <text class="ugc-action-copy">查看审核进度</text>
+    </button>
+    <button wx:if="{{isAdmin}}" class="ugc-action admin" bindtap="goAuditManage">
+      <text class="ugc-action-title">审核管理</text>
+      <text class="ugc-action-copy">处理待审核菜谱</text>
+    </button>
+  </view>
+
   <view class="feedback-card">
     <view class="feedback-head">
       <view>

@@ -1,6 +1,7 @@
 const { getRecipesByIds } = require('../../utils/recommender');
 const { getFavoriteIds, getHistoryIds } = require('../../utils/storage');
 const { enableShareMenu, getDefaultShare, getTimelineShare } = require('../../utils/share');
+const { auditDish } = require('../../utils/ugc');
 
 const FEEDBACK_MAX_LENGTH = 300;
 const FEEDBACK_MIN_LENGTH = 4;
@@ -44,7 +45,8 @@ Page({
     feedbackCount: 0,
     feedbackSubmitting: false,
     feedbackMessage: '',
-    feedbackMessageType: ''
+    feedbackMessageType: '',
+    isAdmin: false
   },
 
   onLoad() {
@@ -56,6 +58,23 @@ Page({
       history: getRecipesByIds(getHistoryIds()).slice(0, 6)
     });
     this.loadFavorites();
+    this.loadAdminStatus();
+  },
+
+  loadAdminStatus() {
+    if (!wx.cloud || !wx.cloud.callFunction) {
+      this.setData({ isAdmin: false });
+      return;
+    }
+    auditDish({ action: 'checkAdmin' }).then((result) => {
+      const isAdmin = Boolean(
+        result.data && (result.data.isAdmin || result.data.admin)
+      );
+      this.setData({ isAdmin });
+    }).catch((error) => {
+      console.warn('管理员身份检查失败', error);
+      this.setData({ isAdmin: false });
+    });
   },
 
   loadFavorites() {
@@ -86,6 +105,24 @@ Page({
   goFatLoss() {
     wx.switchTab({
       url: '/pages/fatloss/fatloss'
+    });
+  },
+
+  goDishUpload() {
+    wx.navigateTo({
+      url: '/pages/dishUpload/dishUpload'
+    });
+  },
+
+  goMyDishes() {
+    wx.navigateTo({
+      url: '/pages/myDishes/myDishes'
+    });
+  },
+
+  goAuditManage() {
+    wx.navigateTo({
+      url: '/pages/auditManage/auditManage'
     });
   },
 

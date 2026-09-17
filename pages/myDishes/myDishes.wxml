@@ -1,0 +1,40 @@
+<view class="page mydishes-page">
+  <view wx:if="{{loading}}" class="empty-state">
+    <text class="empty-title">正在加载投稿</text>
+  </view>
+
+  <view wx:elif="{{loadFailed}}" class="empty-state">
+    <text class="empty-title">加载失败</text>
+    <text class="empty-copy">请检查云开发配置后重试。</text>
+    <button class="ghost-button retry-btn" bindtap="loadMine">重试</button>
+  </view>
+
+  <view wx:elif="{{dishes.length}}" class="dish-list">
+    <view wx:for="{{dishes}}" wx:key="id" class="dish-card">
+      <image class="dish-card-img" src="{{item.image}}" mode="aspectFill" />
+      <view class="dish-card-body">
+        <view class="dish-card-head">
+          <text class="dish-card-name">{{item.name}}</text>
+          <text class="status-tag {{item.statusType}}">{{item.statusLabel}}</text>
+        </view>
+        <text class="dish-card-meta">{{item.time}} 分钟 · {{item.tags.length}} 个标签</text>
+
+        <view wx:if="{{item.statusType === 'rejected' && item.rejectReason}}" class="reject-reason">
+          <text class="reject-reason-title">驳回原因：</text>
+          <text class="reject-reason-text">{{item.rejectReason}}</text>
+        </view>
+
+        <view class="dish-card-actions">
+          <button class="mini-btn ghost" data-id="{{item.id}}" bindtap="goPreview">预览</button>
+          <button class="mini-btn ghost" data-id="{{item.id}}" bindtap="goEdit">编辑</button>
+          <button class="mini-btn danger" data-id="{{item.id}}" bindtap="confirmDelete">删除</button>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view wx:else class="empty-state">
+    <text class="empty-title">还没有投稿</text>
+    <text class="empty-copy">去“传菜谱”分享你做的第一道菜吧。</text>
+  </view>
+</view>
